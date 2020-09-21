@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h1>Hello World!</h1>
+        <form action="./ConverterServlet" method="POST">
+            TargetCurrency: <select name="targetCurrency">
+                <option value="0">Australische Dollar</option>
+                <option value="1">Kanadische Dollar</option>
+                <option value="2">Yen</option>
+                <option value="3">Tansania Schilling</option>
+                <option value="4">Bitcoin</option>
+            </select>
+            <br>
+            Amount:<input type="text" name="inputValue" value="5" />
+            <hr>
+            <input type="submit" value="convert" />
+        </form>
+    </body>
+</html>
