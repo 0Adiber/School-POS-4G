@@ -3,13 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.htlkaindorf.guestbook.controller;
+package at.htlkaindorf.controller;
 
-import at.htlkaindorf.guestbook.beans.GuestBookEntry;
+import at.htlkaindorf.beans.Student;
+import at.htlkaindorf.io.IO_Access;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,16 +21,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "GuestBookController", urlPatterns = {"/GuestBookController"})
-public class GuestBookController extends HttpServlet {
+@WebServlet(name = "StudentController", urlPatterns = {"/StudentController"})
+public class StudentController extends HttpServlet {
 
-    private List<GuestBookEntry> entries = new ArrayList<>();
+    private List<Student> students;
+    private String filter = "";
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config); //To change body of generated methods, choose Tools | Templates.
-        // wird einmal aufgerufen & daher kann man hier dateien einlesen
-        System.out.println(this.getServletContext().getRealPath("/"));
+        String path = this.getServletContext().getRealPath("/students_2020.csv");
+        
+        try {
+            students = new ArrayList<>(IO_Access.loadData(path));
+        } catch (IOException ex) {
+            Logger.getLogger(StudentController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IndexOutOfBoundsException ex) {
+            Logger.getLogger(StudentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     
@@ -42,8 +55,9 @@ public class GuestBookController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
-        //response.setContentType("text/html;charset=UTF-8");
-        request.getRequestDispatcher("guestbook.jsp").forward(request, response);
+        response.setContentType("text/html;charset=UTF-8");
+        request.setAttribute("students", students.stream().filter(s -> s.getLastname().toLowerCase().contains(filter.toLowerCase())).collect(Collectors.toList()));
+        request.getRequestDispatcher("studentView.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -71,25 +85,23 @@ public class GuestBookController extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-              throws ServletException, IOException {
+              throws ServletException, IOException {       
         request.setCharacterEncoding("UTF-8");
         
-        String nickname = request.getParameter("nickname");
-        if(nickname == null || nickname.trim().isEmpty()) {
-            nickname = "unknown";
-        }
-        String email = request.getParameter("email");
-        if(email == null || email.trim().isEmpty()) {
-            nickname = "unknown";
-        }
-        String comment = request.getParameter("comment");
-        if(comment == null || comment.trim().isEmpty()) {
-            comment = "no comment";
-        }
+        this.filter = request.getParameter("filter");
         
-        GuestBookEntry entry = new GuestBookEntry(nickname, email, comment);
-        entries.add(entry);
-        request.setAttribute("guestbookEntires", entries);
+        boolean remove = request.getParameter("remove_filter") != null;
+        if(remove) this.filter = "";
+        
+        request.setAttribute("filter", filter);
+        
+        try {
+            int uid = Integer.parseInt(request.getParameter("uid"));
+            Student student = students.stream().filter(s -> s.getUid() == uid).findFirst().get();
+            request.setAttribute("student", student);
+        }catch(NumberFormatException e) {
+            
+        }
         
         processRequest(request, response);
     }
