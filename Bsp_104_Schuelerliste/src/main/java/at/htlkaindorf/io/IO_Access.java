@@ -9,18 +9,20 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class IO_Access {
     
-    private static DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public static List<Student> loadData(String path) throws FileNotFoundException, IOException, IndexOutOfBoundsException{
-        List<Student> items = new ArrayList<>();
-        InputStreamReader ir = new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8);
+        List<Student> items;
+        /*InputStreamReader ir = new InputStreamReader(new FileInputStream(path), StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(ir);
         String line = "";
         
@@ -34,6 +36,9 @@ public class IO_Access {
             LocalDate geb = LocalDate.from(DTF.parse(parts[4]));
             items.add(new Student(fname, lname, klasse, ges, geb));
         }
+        */
+        
+        items = Files.lines(Paths.get(path)).skip(1).map(Student::new).collect(Collectors.toList());
         
         return items;
     }
