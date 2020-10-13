@@ -3,34 +3,44 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package at.htlkaindorf.guestbook.controller;
+package at.htlkaindorf.controller;
 
-import at.htlkaindorf.guestbook.beans.GuestBookEntry;
+import at.htlkaindorf.beans.Pizza;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
-@WebServlet(name = "GuestBookController", urlPatterns = {"/GuestBookController"})
-public class GuestBookController extends HttpServlet {
-
-    private List<GuestBookEntry> entries = new ArrayList<>();
+@WebServlet(name = "PizzaOrderController", urlPatterns = {"/PizzaOrderController"})
+public class PizzaOrderController extends HttpServlet {
+    
+    private List<Pizza> pizzas = new ArrayList<>();
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config); //To change body of generated methods, choose Tools | Templates.
-        // wird einmal aufgerufen & daher kann man hier dateien einlesen
-        System.out.println(this.getServletContext().getRealPath("/"));
+        try {
+            pizzas = Files.lines(Paths.get(this.getServletContext().getRealPath("/pizzas.csv"))).skip(1).map(Pizza::new).collect(Collectors.toList());
+        } catch (IOException ex) {
+            Logger.getLogger(PizzaOrderController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
-    
-    
     
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -43,13 +53,9 @@ public class GuestBookController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
-        //response.setContentType("text/html;charset=UTF-8");
-        
-        HttpSession session = request.getSession(); //für session scope
-        request.getServletContext().getAttribute("whatever"); //für application scope
-        request.setAttribute("whatever", this); //und eben request scope
-        
-        request.getRequestDispatcher("guestbook.jsp").forward(request, response);
+        response.setContentType("text/html;charset=UTF-8");
+        request.getServletContext().setAttribute("pizzas", pizzas);
+        request.getRequestDispatcher("PizzaOrder.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -78,26 +84,28 @@ public class GuestBookController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
         
-        String nickname = request.getParameter("nickname");
-        if(nickname == null || nickname.trim().isEmpty()) {
-            nickname = "unknown";
-        }
-        String email = request.getParameter("email");
-        if(email == null || email.trim().isEmpty()) {
-            nickname = "unknown";
-        }
-        String comment = request.getParameter("comment");
-        if(comment == null || comment.trim().isEmpty()) {
-            comment = "no comment";
+        Map<Pizza, Integer> order = (HashMap<Pizza,Integer>)request.getSession().getAttribute("order");
+        
+        if(order == null)
+            order = new HashMap<>();
+        
+        for(Pizza p : pizzas) {
+            if(request.getParameter(p.getName() + "_amount") != null) {
+                try {
+                    int amount = Integer.parseInt(request.getParameter(p.getName() + "_amount"));
+                    if(amount == 0)
+                        continue;
+                    order.put(p,amount);
+                }catch(NumberFormatException e) {
+                    
+                }
+            }
         }
         
-        GuestBookEntry entry = new GuestBookEntry(nickname, email, comment);
-        entries.add(entry);
-        request.setAttribute("guestbookEntires", entries);
+        request.getSession().setAttribute("order", order);
         
-        processRequest(request, response);
+        request.getRequestDispatcher("PizzaOrderSummary.jsp").forward(request, response);
     }
 
     /**
