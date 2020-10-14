@@ -4,6 +4,7 @@
     Author     : Adrian
 --%>
 
+<%@page import="at.htlkaindorf.bl.LanguageSelect"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.List"%>
@@ -21,6 +22,12 @@
         
         <div class="inner">
             <h1>Pizza le Gut</h1>
+            <form action="./" method="POST">
+                <select name="language" onchange="submit()">
+                    <option <% out.print(LanguageSelect.getCurrent().equals("de")?"selected":""); %>>de</option>
+                    <option <% out.print(LanguageSelect.getCurrent().equals("en")?"selected":""); %>>en</option>
+                </select>
+            </form>
 
             <form action="./" method="POST" onsubmit="return validate()">
                 <ul class="pizza-list">
@@ -35,7 +42,7 @@
                         %>
                 </ul>
                 <div class="address">
-                    Lieferadresse: <input id="address" name="address" />
+                    Lieferadresse: <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>"/>
                     <button type="submit">Bestellen</button>
                 </div>
             </form>

@@ -36,7 +36,7 @@
                         <td><textarea name="comment" rows="4" cols="25" id="comment">
 Great guestbook
                             </textarea>
-                            <%= 
+                            <%=String.format("JSP ist ein HURENSOHn") 
                                 //fügt string ein z.B. String.format(..)
                             %></td>
                     </tr>
@@ -55,7 +55,7 @@ Great guestbook
                 return;
             }
             for(GuestBookEntry e : entries) {
-                out.println(e);
+                //out.println(e);
             }
             %>
     </body>

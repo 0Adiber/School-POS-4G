@@ -6,6 +6,7 @@
 package at.htlkaindorf.controller;
 
 import at.htlkaindorf.beans.Pizza;
+import at.htlkaindorf.bl.LanguageSelect;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -85,6 +87,15 @@ public class PizzaOrderController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
         
+        if(request.getParameter("language") != null) {
+            Cookie cLan = new Cookie("language", request.getParameter("language"));
+            cLan.setMaxAge(30*24*3600);
+            response.addCookie(cLan);
+            LanguageSelect.setCurrent(cLan.getValue());
+            request.getRequestDispatcher("PizzaOrder.jsp").forward(request, response);
+            return;
+        }
+        
         Map<Pizza, Integer> order = (HashMap<Pizza,Integer>)request.getSession().getAttribute("order");
         
         if(order == null)
@@ -102,8 +113,9 @@ public class PizzaOrderController extends HttpServlet {
                 }
             }
         }
-        
+                
         request.getSession().setAttribute("order", order);
+        request.getSession().setAttribute("address", request.getParameter("address"));
         
         request.getRequestDispatcher("PizzaOrderSummary.jsp").forward(request, response);
     }
