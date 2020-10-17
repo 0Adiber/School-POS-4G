@@ -20,33 +20,35 @@
     </head>
     <body>
         
-        <div class="inner">
-            <h1>Pizza le Gut</h1>
-            <form action="./" method="POST">
-                <select name="language" onchange="submit()">
-                    <option <% out.print(LanguageSelect.getCurrent().equals("de")?"selected":""); %>>de</option>
-                    <option <% out.print(LanguageSelect.getCurrent().equals("en")?"selected":""); %>>en</option>
-                </select>
-            </form>
-
-            <form action="./" method="POST" onsubmit="return validate()">
-                <ul class="pizza-list">
-                    <%
-                        Map<Pizza,Integer> orders = (HashMap<Pizza,Integer>)session.getAttribute("order");
-                        for(Pizza p : (List<Pizza>)application.getAttribute("pizzas")) {
-                            int amount = 0;
-                            if(orders != null && orders.get(p) != null)
-                                amount = orders.get(p);
-                            out.println(p.toHTML(amount));
-                        }
-                        %>
-                </ul>
-                <div class="address">
-                    Lieferadresse: <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>"/>
-                    <button type="submit">Bestellen</button>
-                </div>
-            </form>
+        <div id="header">
+            <img src="logo.png" alt="logo"/>
+            <h1>Pizzeria di Metro</h1>
         </div>
+        
+        <form action="./" method="POST" id="lang-select">
+            <select name="language" onchange="submit()">
+                <option <% out.print(LanguageSelect.getCurrent().equals("de")?"selected":""); %>>de</option>
+                <option <% out.print(LanguageSelect.getCurrent().equals("en")?"selected":""); %>>en</option>
+            </select>
+        </form>
+
+        <form action="./" method="POST" onsubmit="return validate()">
+            <ul class="pizza-list">
+                <%
+                    Map<Pizza,Integer> orders = (HashMap<Pizza,Integer>)session.getAttribute("order");
+                    for(Pizza p : (List<Pizza>)application.getAttribute("pizzas")) {
+                        int amount = 0;
+                        if(orders != null && orders.get(p) != null)
+                            amount = orders.get(p);
+                        out.println(p.toHTML(amount));
+                    }
+                    %>
+            </ul>
+            <div class="address">
+                Lieferadresse: <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>" required/>
+                <button type="submit" id="bt-order">Bestellen</button>
+            </div>
+        </form>
         
     </body>
 </html>

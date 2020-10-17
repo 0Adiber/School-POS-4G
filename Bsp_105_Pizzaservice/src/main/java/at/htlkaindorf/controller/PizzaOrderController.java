@@ -96,10 +96,11 @@ public class PizzaOrderController extends HttpServlet {
             return;
         }
         
-        Map<Pizza, Integer> order = (HashMap<Pizza,Integer>)request.getSession().getAttribute("order");
+        /*Map<Pizza, Integer> order = (HashMap<Pizza,Integer>)request.getSession().getAttribute("order");
         
         if(order == null)
-            order = new HashMap<>();
+            order = new HashMap<>();*/
+        Map<Pizza, Integer> order = new HashMap<>();
         
         for(Pizza p : pizzas) {
             if(request.getParameter(p.getName() + "_amount") != null) {

@@ -50,7 +50,7 @@ public class Pizza {
                   + "<h3 class=\"price\">" + NumberFormat.getCurrencyInstance(Locale.GERMANY).format(price) + "</h3>"
                   + "<div class=\"amount-choose\">"
                   + "<button type=\"button\" class=\"bt_decrease\" onclick=\"amount('" + name + "', -1)\">-</button>"
-                  + "<input class=\"amount\" id=\"" + name+"_amount" + "\" name=\"" + name+"_amount" + "\" value='" + amount + "' type='number' />"
+                  + "<input class=\"amount\" id=\"" + name+"_amount" + "\" name=\"" + name+"_amount" + "\" value='" + amount + "' type='number' readonly />"
                   + "<button type=\"button\" class=\"bt_decrease\" onclick=\"amount('" + name + "', 1)\">+</button>"
                   + "</div>"
                   + "</li>";
