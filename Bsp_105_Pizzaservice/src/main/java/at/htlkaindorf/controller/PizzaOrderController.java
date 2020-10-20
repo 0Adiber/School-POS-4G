@@ -38,6 +38,7 @@ public class PizzaOrderController extends HttpServlet {
         super.init(config); //To change body of generated methods, choose Tools | Templates.
         try {
             pizzas = Files.lines(Paths.get(this.getServletContext().getRealPath("/pizzas.csv"))).skip(1).map(Pizza::new).collect(Collectors.toList());
+            
         } catch (IOException ex) {
             Logger.getLogger(PizzaOrderController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -72,6 +73,12 @@ public class PizzaOrderController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
+        
+        for(Cookie c : request.getCookies()) {
+            if(c.getName().equalsIgnoreCase("language"))
+                request.setAttribute("language", c.getValue());
+        }
+        
         processRequest(request, response);
     }
 
@@ -87,13 +94,21 @@ public class PizzaOrderController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
         
-        if(request.getParameter("language") != null) {
+        if(request.getParameter("language") != null) {            
             Cookie cLan = new Cookie("language", request.getParameter("language"));
             cLan.setMaxAge(30*24*3600);
             response.addCookie(cLan);
-            LanguageSelect.setCurrent(cLan.getValue());
-            request.getRequestDispatcher("PizzaOrder.jsp").forward(request, response);
+            request.setAttribute("language", cLan.getValue());
+            if(request.getParameter("page").equalsIgnoreCase("summary"))
+                request.getRequestDispatcher("PizzaOrderSummary.jsp").forward(request, response);
+            else
+                request.getRequestDispatcher("PizzaOrder.jsp").forward(request, response);
             return;
+        }
+        
+        for(Cookie c : request.getCookies()) {
+            if(c.getName().equalsIgnoreCase("language"))
+                request.setAttribute("language", c.getValue());
         }
         
         /*Map<Pizza, Integer> order = (HashMap<Pizza,Integer>)request.getSession().getAttribute("order");
@@ -103,9 +118,9 @@ public class PizzaOrderController extends HttpServlet {
         Map<Pizza, Integer> order = new HashMap<>();
         
         for(Pizza p : pizzas) {
-            if(request.getParameter(p.getName() + "_amount") != null) {
+            if(request.getParameter(p.getId()+ "_amount") != null) {
                 try {
-                    int amount = Integer.parseInt(request.getParameter(p.getName() + "_amount"));
+                    int amount = Integer.parseInt(request.getParameter(p.getId()+ "_amount"));
                     if(amount == 0)
                         continue;
                     order.put(p,amount);

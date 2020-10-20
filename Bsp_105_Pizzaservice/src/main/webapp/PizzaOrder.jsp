@@ -11,6 +11,11 @@
 <%@page import="at.htlkaindorf.beans.Pizza"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%
+    String language = request.getAttribute("language")==null ? "de" : (String)request.getAttribute("language");
+    
+    Map<String,String> translations = LanguageSelect.getLanguage(language);
+    %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -27,9 +32,10 @@
         
         <form action="./" method="POST" id="lang-select">
             <select name="language" onchange="submit()">
-                <option <% out.print(LanguageSelect.getCurrent().equals("de")?"selected":""); %>>de</option>
-                <option <% out.print(LanguageSelect.getCurrent().equals("en")?"selected":""); %>>en</option>
+                <option <% out.print(language.equals("de")?"selected":""); %> value="de">Deutsch</option>
+                <option <% out.print(language.equals("en")?"selected":""); %> value="en">English</option>
             </select>
+            <input type="hidden" name="page" value="order" />
         </form>
 
         <form action="./" method="POST" onsubmit="return validate()">
@@ -40,13 +46,13 @@
                         int amount = 0;
                         if(orders != null && orders.get(p) != null)
                             amount = orders.get(p);
-                        out.println(p.toHTML(amount));
+                        out.println(p.toHTML(amount,language));
                     }
                     %>
             </ul>
             <div class="address">
-                Lieferadresse: <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>" required/>
-                <button type="submit" id="bt-order">Bestellen</button>
+                <%= translations.get("address") %> <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>" required/>
+                <button type="submit" id="bt-order"><%= translations.get("order") %></button>
             </div>
         </form>
         

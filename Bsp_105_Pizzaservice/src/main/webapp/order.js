@@ -7,10 +7,16 @@ function amount(name, amount) {
 function validate() {
     let address = document.getElementById('address').value;
     
-    console.log(address);
-    
     if(!address)
         return false;
     
-    return true;
+    let amounts = document.querySelectorAll('[id*="_amount"]');
+    
+    let valid = false;
+    for (let i of amounts) {
+        if(i.value > 0)
+            valid = true;
+    }
+    
+    return valid;
 }

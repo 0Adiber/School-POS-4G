@@ -12,6 +12,11 @@
 <%@page import="at.htlkaindorf.beans.Pizza"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%
+    String language = request.getAttribute("language")==null ? "de" : (String)request.getAttribute("language");
+    
+    Map<String,String> translations = LanguageSelect.getLanguage(language);
+    %>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -26,30 +31,31 @@
         
         <form action="./" method="POST" id="lang-select">
             <select name="language" onchange="submit()">
-                <option <% out.print(LanguageSelect.getCurrent().equals("de")?"selected":""); %>>de</option>
-                <option <% out.print(LanguageSelect.getCurrent().equals("en")?"selected":""); %>>en</option>
+                <option <% out.print(language.equals("de")?"selected":""); %> value="de">Deutsch</option>
+                <option <% out.print(language.equals("en")?"selected":""); %> value="en">English</option>
             </select>
+            <input type="hidden" name="page" value="summary" />
         </form>
 
         <table>
             <tr>
-                <th>Pizza</th>
-                <th>Preis</th>
-                <th>Stück</th>
-                <th>Gesamt</th>
+                <th><%= translations.get("pizza") %></th>
+                <th><%= translations.get("price") %></th>
+                <th><%= translations.get("amount") %></th>
+                <th><%= translations.get("total") %></th>
             </tr>
             <%
                 Map<Pizza, Integer> order = (Map<Pizza, Integer>)session.getAttribute("order");
                 double sum = 0;
                 for(Pizza p : order.keySet()) {
-                    out.print(String.format("<tr><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>", p.getName(), NumberFormat.getCurrencyInstance(Locale.GERMANY).format(p.getPrice()), order.get(p), NumberFormat.getCurrencyInstance(Locale.GERMANY).format(p.getPrice()*order.get(p))));
+                    out.print(String.format("<tr><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>", p.getName(language), NumberFormat.getCurrencyInstance(Locale.GERMANY).format(p.getPrice()), order.get(p), NumberFormat.getCurrencyInstance(Locale.GERMANY).format(p.getPrice()*order.get(p))));
                     sum+=p.getPrice()*order.get(p);
                 }
-                out.print(String.format("<tr><td></td><td></td><td>Summe</td><td>%s</td></tr>",NumberFormat.getCurrencyInstance(Locale.GERMANY).format(sum)));
+                out.print(String.format("<tr><td></td><td></td><td>%s</td><td>%s</td></tr>",translations.get("sum"), NumberFormat.getCurrencyInstance(Locale.GERMANY).format(sum)));
                 %>
         </table>
-        <p id="order-address">Lieferadresse: <%= session.getAttribute("address") %></p>
-        <a href="./"><button id="back">Zurück</button></a>
+        <p id="order-address"> <%= translations.get("address") + ": " + session.getAttribute("address") %></p>
+        <a href="./"><button id="back"><%= translations.get("back") %></button></a>
         
     </body>
 </html>
