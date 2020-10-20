@@ -74,9 +74,16 @@ public class PizzaOrderController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
         
-        for(Cookie c : request.getCookies()) {
-            if(c.getName().equalsIgnoreCase("language"))
-                request.setAttribute("language", c.getValue());
+        if(request.getCookies() != null) {
+            for(Cookie c : request.getCookies()) {
+                if(c.getName().equalsIgnoreCase("language"))
+                    request.setAttribute("language", c.getValue());
+            }
+        }
+        
+        if(request.getParameter("save") == null) {
+            request.getSession().removeAttribute("order");
+            request.getSession().removeAttribute("address");
         }
         
         processRequest(request, response);
@@ -111,10 +118,14 @@ public class PizzaOrderController extends HttpServlet {
                 request.setAttribute("language", c.getValue());
         }
         
-        /*Map<Pizza, Integer> order = (HashMap<Pizza,Integer>)request.getSession().getAttribute("order");
+        if(request.getParameter("address") == null || request.getParameter("address").trim().isEmpty()) {
+            request.setAttribute("error", "erraddr");
+            request.getServletContext().setAttribute("pizzas", pizzas);
+            request.getSession().removeAttribute("order");
+            request.getSession().removeAttribute("address");
+            request.getRequestDispatcher("PizzaOrder.jsp").forward(request, response);
+        }
         
-        if(order == null)
-            order = new HashMap<>();*/
         Map<Pizza, Integer> order = new HashMap<>();
         
         for(Pizza p : pizzas) {
@@ -128,6 +139,13 @@ public class PizzaOrderController extends HttpServlet {
                     
                 }
             }
+        }
+        
+        if(order.isEmpty()) {
+            request.setAttribute("error", "errpizza");
+            request.getSession().removeAttribute("address");
+            request.getSession().removeAttribute("order");
+            request.getRequestDispatcher("PizzaOrder.jsp").forward(request, response);
         }
                 
         request.getSession().setAttribute("order", order);

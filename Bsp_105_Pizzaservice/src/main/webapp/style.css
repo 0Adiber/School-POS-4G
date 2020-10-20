@@ -213,11 +213,15 @@ tr:nth-last-child(2) td {
     font-size: 2em;
 }
 
-#back {
+#backs {
     position: absolute;
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
+}
+
+#back {
+    position: relative;
     width: 140px;
     height: 50px;
     color: black;
@@ -236,4 +240,16 @@ tr:nth-last-child(2) td {
 
 a {
     text-decoration: none;
+}
+
+#error {
+    background-color: #f55a42;
+    width: 60%;
+    border-radius: 20px;
+    text-align: center;
+    padding: 20px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
 }

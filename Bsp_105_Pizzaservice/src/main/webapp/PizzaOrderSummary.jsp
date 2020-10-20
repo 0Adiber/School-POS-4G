@@ -55,7 +55,10 @@
                 %>
         </table>
         <p id="order-address"> <%= translations.get("address") + ": " + session.getAttribute("address") %></p>
-        <a href="./"><button id="back"><%= translations.get("back") %></button></a>
+        <div id="backs">
+            <a href="./"><button id="back"><%= translations.get("back") %></button></a>
+            <a href="./?save"><button id="back"><%= translations.get("backsave") %></button></a>
+        </div>
         
     </body>
 </html>

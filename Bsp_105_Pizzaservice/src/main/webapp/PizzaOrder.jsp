@@ -56,5 +56,11 @@
             </div>
         </form>
         
+        <%
+            if(request.getAttribute("error") != null) {
+                String err = (String)request.getAttribute("error");
+                out.println("<div id=\"error\">" + translations.get(err) + "</div>");
+            }
+            %>
     </body>
 </html>
