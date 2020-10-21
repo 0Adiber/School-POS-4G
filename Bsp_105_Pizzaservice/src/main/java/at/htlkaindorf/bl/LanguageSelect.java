@@ -6,6 +6,9 @@ import java.util.Map;
 public class LanguageSelect {
     
     private final static Map<String,Map<String,String>> language = new HashMap<>();
+
+    public LanguageSelect() {
+    }
     
     static {
         Map<String,String> de = new HashMap<>();

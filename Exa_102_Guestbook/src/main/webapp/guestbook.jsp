@@ -4,6 +4,8 @@
     Author     : Adrian
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
 <%@page import="at.htlkaindorf.guestbook.beans.GuestBookEntry"%>
@@ -19,6 +21,7 @@
         //wird statisch 
     %>
     <body style="background-color: aquamarine;">
+        
         <h1>Welcome to our Guestbook</h1>
         <form action="GuestBookController" method="POST" onsubmit="return validate()">
             <table border="0">
@@ -47,7 +50,7 @@ Great guestbook
         <br />
         <hr>
         <br />
-        <% 
+        <%-- 
             //es gibt session satt request
             //application => für application scope
             List<GuestBookEntry> entries = (ArrayList<GuestBookEntry>)request.getAttribute("guestbookEntires");
@@ -57,6 +60,12 @@ Great guestbook
             for(GuestBookEntry e : entries) {
                 //out.println(e);
             }
-            %>
+            --%>
+            ${String.format("%s", la)}
+            <c:forEach var="entry" items="${requestScope.guestbookEntires}"> <!--requestScope muss man nicht angeben; wenn weggelassen dann sucht er-->
+                <c:if test="${entry.nickname == 'Spiderman'}">
+                    ${entry.nickname} says: ${entry.comment}<br>
+                </c:if>
+            </c:forEach>
     </body>
 </html>

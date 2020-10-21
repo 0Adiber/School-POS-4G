@@ -4,17 +4,24 @@
     Author     : Adrian
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="at.htlkaindorf.bl.LanguageSelect"%>
 <%@page import="java.util.Map"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.List"%>
 <%@page import="at.htlkaindorf.beans.Pizza"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<!-- to use LanguageSelect: -->
+<jsp:useBean id="langsel" class="at.htlkaindorf.bl.LanguageSelect"/>
+
 <!DOCTYPE html>
+<c:set scope="page" var="language" value="${requestScope.language == null ? 'de' : requestScope.language}" />
+<c:set scope="page" var="translations" value="${langsel.getLanguage(language)}" />
 <%
-    String language = request.getAttribute("language")==null ? "de" : (String)request.getAttribute("language");
+    //String language = request.getAttribute("language")==null ? "de" : (String)request.getAttribute("language");
     
-    Map<String,String> translations = LanguageSelect.getLanguage(language);
+    //Map<String,String> translations = LanguageSelect.getLanguage((String)pageContext.getAttribute("language"));
     %>
 <html>
     <head>
@@ -24,7 +31,7 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        
+               
         <div id="header">
             <img src="logo.png" alt="logo"/>
             <h1>Pizzeria di Metro</h1>
@@ -32,8 +39,8 @@
         
         <form action="./" method="POST" id="lang-select">
             <select name="language" onchange="submit()">
-                <option <% out.print(language.equals("de")?"selected":""); %> value="de">Deutsch</option>
-                <option <% out.print(language.equals("en")?"selected":""); %> value="en">English</option>
+                <option <c:if test="${pageScope.language == 'de'}">selected</c:if> value="de">Deutsch</option>
+                <option <c:if test="${pageScope.language == 'en'}">selected</c:if> value="en">English</option>
             </select>
             <input type="hidden" name="page" value="order" />
         </form>
@@ -46,21 +53,21 @@
                         int amount = 0;
                         if(orders != null && orders.get(p) != null)
                             amount = orders.get(p);
-                        out.println(p.toHTML(amount,language));
+                        out.println(p.toHTML(amount,(String)pageContext.getAttribute("language")));
                     }
                     %>
             </ul>
             <div class="address">
-                <%= translations.get("address") %> <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>" required/>
-                <button type="submit" id="bt-order"><%= translations.get("order") %></button>
+                ${translations.get("address")} <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>" required/>
+                <button type="submit" id="bt-order">${translations.get("order")}</button>
             </div>
         </form>
-        
-        <%
+         
+        <%--
             if(request.getAttribute("error") != null) {
                 String err = (String)request.getAttribute("error");
                 out.println("<div id=\"error\">" + translations.get(err) + "</div>");
             }
-            %>
+           --%>
     </body>
 </html>

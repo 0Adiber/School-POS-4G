@@ -4,6 +4,8 @@
     Author     : Adrian
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="at.htlkaindorf.bl.LanguageSelect"%>
 <%@page import="java.util.Locale"%>
 <%@page import="java.text.NumberFormat"%>
@@ -11,11 +13,18 @@
 <%@page import="java.util.concurrent.atomic.AtomicInteger"%>
 <%@page import="at.htlkaindorf.beans.Pizza"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<!-- to use LanguageSelect: -->
+<jsp:useBean id="langsel" class="at.htlkaindorf.bl.LanguageSelect"/>
+
 <!DOCTYPE html>
+<c:set scope="page" var="language" value="${requestScope.language == null ? 'de' : requestScope.language}" />
+<c:set scope="page" var="translations" value="${langsel.getLanguage(language)}" />
+
 <%
-    String language = request.getAttribute("language")==null ? "de" : (String)request.getAttribute("language");
+    //String language = request.getAttribute("language")==null ? "de" : (String)request.getAttribute("language");
     
-    Map<String,String> translations = LanguageSelect.getLanguage(language);
+    //Map<String,String> translations = LanguageSelect.getLanguage((String)pageContext.getAttribute("language"));
     %>
 <html>
     <head>
@@ -31,20 +40,26 @@
         
         <form action="./" method="POST" id="lang-select">
             <select name="language" onchange="submit()">
-                <option <% out.print(language.equals("de")?"selected":""); %> value="de">Deutsch</option>
-                <option <% out.print(language.equals("en")?"selected":""); %> value="en">English</option>
+                <option <c:if test="${pageScope.language == 'de'}">selected</c:if> value="de">Deutsch</option>
+                <option <c:if test="${pageScope.language == 'en'}">selected</c:if> value="en">English</option>
             </select>
             <input type="hidden" name="page" value="summary" />
         </form>
 
         <table>
             <tr>
-                <th><%= translations.get("pizza") %></th>
-                <th><%= translations.get("price") %></th>
-                <th><%= translations.get("amount") %></th>
-                <th><%= translations.get("total") %></th>
+                <th>${translations.get("pizza")}</th>
+                <th>${translations.get("price")}</th>
+                <th>${translations.get("amount")}</th>
+                <th>${translations.get("total")}</th>
             </tr>
-            <%
+            <fmt:setLocale value="de_DE" />
+            <c:forEach var="p" items="${order.keySet()}">
+                <tr><td>${p.getName(language)}</td><td><fmt:formatNumber value="${p.price}" type="currency" /></td><td>${order.get(p)}</td><td><fmt:formatNumber value="${p.price * order.get(p)}" type="currency" /></td></tr>
+                <c:set scope="page" var="sum" value="${sum+p.getPrice()*order.get(p)}"></c:set>
+            </c:forEach>
+                <tr><td></td><td></td><td>${translations.get("sum")}</td><td><fmt:formatNumber value="${sum}" type="currency" /></td></tr>
+            <%--
                 Map<Pizza, Integer> order = (Map<Pizza, Integer>)session.getAttribute("order");
                 double sum = 0;
                 for(Pizza p : order.keySet()) {
@@ -52,12 +67,12 @@
                     sum+=p.getPrice()*order.get(p);
                 }
                 out.print(String.format("<tr><td></td><td></td><td>%s</td><td>%s</td></tr>",translations.get("sum"), NumberFormat.getCurrencyInstance(Locale.GERMANY).format(sum)));
-                %>
+                --%>
         </table>
-        <p id="order-address"> <%= translations.get("address") + ": " + session.getAttribute("address") %></p>
+                <p id="order-address"> ${translations.get("address")}: ${address}</p>
         <div id="backs">
-            <a href="./"><button id="back"><%= translations.get("back") %></button></a>
-            <a href="./?save"><button id="back"><%= translations.get("backsave") %></button></a>
+            <a href="./"><button id="back">${translations.get("back")}</button></a>
+            <a href="./?save"><button id="back">${translations.get("backsave")}</button></a>
         </div>
         
     </body>
