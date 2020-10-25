@@ -69,7 +69,7 @@
                 out.print(String.format("<tr><td></td><td></td><td>%s</td><td>%s</td></tr>",translations.get("sum"), NumberFormat.getCurrencyInstance(Locale.GERMANY).format(sum)));
                 --%>
         </table>
-                <p id="order-address"> ${translations.get("address")}: ${address}</p>
+        <p id="order-address"> ${translations.get("address")}: ${address}</p>
         <div id="backs">
             <a href="./"><button id="back">${translations.get("back")}</button></a>
             <a href="./?save"><button id="back">${translations.get("backsave")}</button></a>

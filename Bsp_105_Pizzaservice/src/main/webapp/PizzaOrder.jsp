@@ -4,6 +4,7 @@
     Author     : Adrian
 --%>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page import="at.htlkaindorf.bl.LanguageSelect"%>
 <%@page import="java.util.Map"%>
@@ -47,7 +48,7 @@
 
         <form action="./" method="POST" onsubmit="return validate()">
             <ul class="pizza-list">
-                <%
+                <%--
                     Map<Pizza,Integer> orders = (HashMap<Pizza,Integer>)session.getAttribute("order");
                     for(Pizza p : (List<Pizza>)application.getAttribute("pizzas")) {
                         int amount = 0;
@@ -55,7 +56,19 @@
                             amount = orders.get(p);
                         out.println(p.toHTML(amount,(String)pageContext.getAttribute("language")));
                     }
-                    %>
+                    --%>
+                    
+                <c:forEach var="p" items="${pizzas}">
+                    
+                    <c:choose>
+                        <c:when test="${order != null && order.get(p) != null}">
+                            <c:out escapeXml="false" value="${p.toHTML(order.get(p), language)}" />
+                        </c:when>
+                        <c:otherwise>
+                            <c:out escapeXml="false" value="${p.toHTML(0, language)}" />
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
             </ul>
             <div class="address">
                 ${translations.get("address")} <input id="address" name="address" value="<%= session.getAttribute("address")!=null ? session.getAttribute("address"):"" %>" required/>
@@ -63,6 +76,9 @@
             </div>
         </form>
          
+        <c:if test="${error != null}">
+            <div id="error">${translations.get(error)}</div>
+        </c:if>
         <%--
             if(request.getAttribute("error") != null) {
                 String err = (String)request.getAttribute("error");

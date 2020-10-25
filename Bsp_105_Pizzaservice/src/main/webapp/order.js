@@ -17,6 +17,6 @@ function validate() {
         if(i.value > 0)
             valid = true;
     }
-    
+        
     return valid;
 }
