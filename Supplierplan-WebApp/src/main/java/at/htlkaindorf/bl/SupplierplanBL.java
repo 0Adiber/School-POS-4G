@@ -27,11 +27,12 @@ public class SupplierplanBL {
         return lessons;
     }
     
-    public boolean setLesson(DAYS day, int lesson, List<String> teachers) {
+    public boolean setLesson(DAYS day, int lesson, String subject, List<String> teachers) {
         Stunde s = lessons.get(getKey(day, lesson));
         if(s == null)
             return false;
         
+        s.setFach(subject);
         s.setLehrer(teachers);
         s.setSupplierung(true);
         
@@ -43,15 +44,18 @@ public class SupplierplanBL {
 			String line = br.readLine();
 			klasse = line;
 			br.close();
-        List<Stunde> temp = Files.lines(Paths.get(path)).skip(1).filter(l -> !l.startsWith("-")).map(Stunde::new).collect(Collectors.toList());
+        List<Stunde> temp = Files.lines(Paths.get(path)).skip(1).map(Stunde::new).collect(Collectors.toList());
         
-        int i = 0;
+        int i = -1;
         for(Stunde s : temp) {
-            lessons.put(getKey(DAYS.values()[i%DAYS.values().length], Math.floorDiv(i++, DAYS.values().length)+1), s);
+            i++;
+            if(s.getFach().startsWith("-"))
+                continue;
+            lessons.put(getKey(DAYS.values()[i%DAYS.values().length], Math.floorDiv(i, DAYS.values().length)+1), s);
         }
     }
     
-    private Stunde getLesson(DAYS day, int lesson) {
+    public Stunde getLesson(DAYS day, int lesson) {
         return lessons.get(getKey(day, lesson));
     }
     

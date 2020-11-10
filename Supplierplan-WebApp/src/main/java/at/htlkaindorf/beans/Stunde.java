@@ -12,7 +12,7 @@ public class Stunde {
     private boolean supplierung;
 
     public Stunde(String line) {
-        String[] parts = line.split("\\[,;]\\s*");
+        String[] parts = line.split("[,;]");
         fach = parts[0];
         lehrer = Arrays.asList(parts).stream().skip(1).collect(Collectors.toList());
     }
@@ -45,8 +45,11 @@ public class Stunde {
 
     public void setSupplierung(boolean supplierung) {
         this.supplierung = supplierung;
+    }    
+
+    public String getTeachers() {
+        String res = Arrays.toString(lehrer.toArray());
+        return res.substring(1,res.length()-1);
     }
-    
-    
     
 }

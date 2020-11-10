@@ -5,6 +5,8 @@ import at.htlkaindorf.bl.SupplierplanBL;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletConfig;
@@ -17,13 +19,16 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "SupplierplanController", urlPatterns = {"/SupplierplanController"})
 public class SupplierplanController extends HttpServlet {
 
+    private SupplierplanBL bl;
+    
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config); //To change body of generated methods, choose Tools | Templates.
         
         try {
-            SupplierplanBL bl = new SupplierplanBL(config.getServletContext().getRealPath("/stundenplan.csv"));
+            bl = new SupplierplanBL(config.getServletContext().getRealPath("/stundenplan.csv"));
             config.getServletContext().setAttribute("bl", bl);
+            config.getServletContext().setAttribute("days", DAYS.values());
         } catch (IOException ex) {
             Logger.getLogger(SupplierplanController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -42,7 +47,6 @@ public class SupplierplanController extends HttpServlet {
               throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        request.setAttribute("days", DAYS.values());
         request.getRequestDispatcher("supplierplanView.jsp").forward(request, response);
                 
     }
@@ -73,6 +77,53 @@ public class SupplierplanController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
               throws ServletException, IOException {
+        DAYS day = null;
+        int lesson = -1;
+        String subject, teacher;
+        boolean error = false; //if error, set to true and do not change anything
+        
+        //parse day
+        try {
+            day = DAYS.valueOf(request.getParameter("day").toUpperCase());
+        }catch(NullPointerException | IllegalArgumentException e) {
+            request.setAttribute("dayError", "Ungültiger Tag");
+            error = true;
+        }
+        
+        try {
+            lesson = Integer.parseInt(request.getParameter("lesson"));
+            if(lesson < 0 || lesson > 10) {
+                throw new NumberFormatException();
+            }
+        } catch(NumberFormatException e) {
+            request.setAttribute("lessonError", "Ungültige Stunde: 1 <= Stunde <= 10");
+            error = true;
+        }
+        
+        subject = request.getParameter("subject");
+        teacher = request.getParameter("teacher");
+        
+        if(subject == null || subject.isEmpty()) {
+            request.setAttribute("subjectError", "Fach eingeben!");
+            error = true;
+        }
+        
+        if(subject == null || subject.isEmpty()) {
+            request.setAttribute("teacherError", "Lehrer eingeben!");
+            error = true;
+        }
+        
+        if(error) {
+            processRequest(request, response);
+            return;
+        }
+        
+        List<String> teachers = Arrays.asList(teacher.split("[,;]"));
+        
+        if(!bl.setLesson(day, lesson, subject, teachers)) {
+            request.setAttribute("error", "Supplierung einer Freistunde nicht möglich!");
+        }
+        
         processRequest(request, response);
     }
 
