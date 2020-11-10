@@ -24,6 +24,7 @@
                 <tr>
                     <th />
                     <c:forEach items="${days}" var="d">
+                        
                     </c:forEach>
                 </tr>
             </thead>
