@@ -26,9 +26,10 @@ public class SupplierplanController extends HttpServlet {
         super.init(config); //To change body of generated methods, choose Tools | Templates.
         
         try {
+            //get path
             bl = new SupplierplanBL(config.getServletContext().getRealPath("/stundenplan.csv"));
-            config.getServletContext().setAttribute("bl", bl);
-            config.getServletContext().setAttribute("days", DAYS.values());
+            config.getServletContext().setAttribute("bl", bl); //set on application scope
+            config.getServletContext().setAttribute("days", DAYS.values()); //same 
         } catch (IOException ex) {
             Logger.getLogger(SupplierplanController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -82,7 +83,7 @@ public class SupplierplanController extends HttpServlet {
         String subject, teacher;
         boolean error = false; //if error, set to true and do not change anything
         
-        //parse day
+        //parse day and send error if wrong day
         try {
             day = DAYS.valueOf(request.getParameter("day").toUpperCase());
         }catch(NullPointerException | IllegalArgumentException e) {
@@ -90,6 +91,7 @@ public class SupplierplanController extends HttpServlet {
             error = true;
         }
         
+        //same for lesson
         try {
             lesson = Integer.parseInt(request.getParameter("lesson"));
             if(lesson < 0 || lesson > 10) {
@@ -113,13 +115,16 @@ public class SupplierplanController extends HttpServlet {
             error = true;
         }
         
+        //if there was an error, change nothing
         if(error) {
             processRequest(request, response);
             return;
         }
         
+        //split for regex (same as the file) 
         List<String> teachers = Arrays.asList(teacher.split("[,;]"));
         
+        //change the timetable, if return is false, then there was something wrong
         if(!bl.setLesson(day, lesson, subject, teachers)) {
             request.setAttribute("error", "Supplierung einer Freistunde nicht möglich!");
         }

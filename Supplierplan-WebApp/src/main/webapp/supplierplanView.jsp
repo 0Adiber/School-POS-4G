@@ -48,16 +48,18 @@
                 <thead>
                     <tr>
                         <th />
+                        <!-- display the days in the header -->
                         <c:forEach items="${days}" var="d">
-                            <th class="header">${d.toString().substring(0,2)}</th>
+                            <th class="header">${d.toString().substring(0,2).toLowerCase()}</th>
                         </c:forEach>
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- go from one to ten for each lesson -->
                     <c:forEach begin="1" end="10" var="i">
                         <tr>
                             <td>${i}</td>
-
+                            <!-- go through the days to display each lesson -->
                             <c:forEach items="${days}" var="d">
                                 <c:set var="lesson" value="${bl.getLesson(d,i)}" />
                                 <td class="${lesson.supplierung ? 'suppliert' : ''}">
