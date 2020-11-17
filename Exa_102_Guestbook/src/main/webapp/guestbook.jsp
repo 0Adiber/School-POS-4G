@@ -61,11 +61,35 @@ Great guestbook
                 //out.println(e);
             }
             --%>
-            ${String.format("%s", la)}
-            <c:forEach var="entry" items="${requestScope.guestbookEntires}"> <!--requestScope muss man nicht angeben; wenn weggelassen dann sucht er-->
-                <c:if test="${entry.nickname == 'Spiderman'}">
+            
+            <c:forEach var="i" begin="50" end="100" step="5">
+                ${i mod 10 == 0}
+            </c:forEach>
+            he
+            ${guestbookEntries[0] < guestbookEntries[1]}
+                                                                             <!-- sessionScope oder applicationScope auch -->
+            <c:forEach var="entry" items="${requestScope.guestbookEntries}"> <!--requestScope muss man nicht angeben; wenn weggelassen dann sucht er-->
+                <c:if test="${entry.nickname != ''}">                        <!-- falls guestbookEntries null, dann keine ausgabe, aber keine exception! -->
                     ${entry.nickname} says: ${entry.comment}<br>
                 </c:if>
             </c:forEach>
+                    <br>        
+            Cookie: ${cookie.JSESSIONID.value}
+            Cookie: ${cookie['JSESSIONID'].value} <!-- bei maps kann man so oder so zugreifen -->
+            <br>
+            <ul>
+            <c:forEach var="c" items="${cookie}">
+                <li>key: ${c.key} - value: ${c.value.value}</li>
+            </c:forEach>
+            </ul>
+            
+            <c:forTokens var="str" items="${'17.11.2020 10:37'}" delims=". :"> <!-- mehrere delimiter möglich -->
+                <c:out value="${st}" escapeXml="false">unknown</c:out> <!-- "unknown" is der default wert, falls das andere null -->
+                <%-- ${str} <br> --%>
+            </c:forTokens>
+                
+            <c:set var="salary" scope="session" value="1234.56"></c:set>
+            
+            <!-- c:if  c:otherwise -->
     </body>
 </html>
