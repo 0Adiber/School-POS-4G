@@ -28,7 +28,7 @@ public class ContactController extends HttpServlet {
             IOAccess.ReadResult rs = IOAccess.readJson(config.getServletContext().getRealPath("/contacts.json"));
             contacts = rs.getContacts();
             companies = rs.getCompanies();
-            System.out.println(contacts.get(0));
+            config.getServletContext().setAttribute("contacts", contacts);
         } catch (IOException ex) {
             Logger.getLogger(ContactController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -46,6 +46,15 @@ public class ContactController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        int page;
+        try {
+            page = Integer.parseInt(request.getParameter("page"));
+            page = page < 1 ? 0 : Math.ceil(contacts.size()/30) >= page ? page : page-1;
+        }catch(NumberFormatException ex) {
+            page = 0;
+        }
+        
+        request.setAttribute("page", page);
         request.getRequestDispatcher("contactView.jsp").forward(request, response);
     }
 

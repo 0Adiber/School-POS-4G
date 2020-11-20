@@ -2,16 +2,12 @@ package at.htlkaindorf.pojos;
 
 import at.htlkaindorf.beans.Gender;
 import bl.LocalDateDeserializer;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-
 
 @Data
 @AllArgsConstructor
