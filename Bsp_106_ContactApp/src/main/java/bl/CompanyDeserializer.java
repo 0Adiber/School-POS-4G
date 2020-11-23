@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class CompanyDeserializer extends StdDeserializer<Company>{
 
-    private static final Set<Company> companies = new HashSet<>();
+    public static final Set<Company> companies = new HashSet<>();
     
     protected CompanyDeserializer() {
         super(Company.class);
