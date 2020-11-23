@@ -1,6 +1,7 @@
 package at.htlkaindorf.pojos;
 
 import at.htlkaindorf.beans.Gender;
+import bl.CompanyDeserializer;
 import bl.LocalDateDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.LocalDate;
@@ -19,5 +20,6 @@ public class Contact {
     private Gender gender;
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate dateOfBirth;
+    @JsonDeserialize(using = CompanyDeserializer.class)
     private Company company;
 }
