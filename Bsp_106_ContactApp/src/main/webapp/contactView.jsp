@@ -16,7 +16,7 @@
                 <select name="company">
                     <option value="NONE">NONE</option>
                     <c:forEach var="c" items="${companies}">
-                        <option value="${c.name}" ${curcompany == c ? 'selected' : ''}>${c.name}</option>
+                        <option value="${c.name}${c.stockmarket}" ${curcompany == c ? 'selected' : ''}>${c.name} - ${c.stockmarket}</option>
                     </c:forEach>
                 </select>
             </label>
@@ -43,6 +43,7 @@
                     <th>Gender <input type="checkbox" name="sort_<%= Sortings.GENDER %>" onChange="submit();" ${sortStr.contains("GENDER") ? 'checked':''}/></th>
                     <th>Date of Birth <input type="checkbox" name="sort_<%= Sortings.BIRTH %>" onChange="submit();" ${sortStr.contains("BIRTH") ? 'checked':''}/></th>
                     <th>Company <input type="checkbox" name="sort_<%= Sortings.COMPANY %>" onChange="submit();" ${sortStr.contains("COMPANY") ? 'checked':''}/></th>
+                    <th>E-Mail</th>
                 </tr>
                 <c:forEach var="c" items="${contacts}">
                     <tr>
@@ -51,7 +52,14 @@
                         <td>${c.lastname}</td>
                         <td>${c.gender}</td>
                         <td>${c.dateOfBirth}</td>
-                        <td>${c.company.name}</td>
+                        <td>${c.company.name} - ${c.company.stockmarket}</td>
+                        <td>
+                            <select>
+                                <c:forEach var="e" items="${c.email}">
+                                    <option>${e}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
                     </tr>
                 </c:forEach>
             </table>

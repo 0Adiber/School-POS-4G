@@ -27,6 +27,15 @@ public class IOAccess {
         
         Set<Company> companies = CompanyDeserializer.companies;
         
+        for(Contact c : contacts) {
+            for(Company com : companies) {
+                if(c.getCompany().equals(com)) {
+                    com.getContacts().add(c);
+                    break;
+                }
+            }
+        }
+        
         return new ReadResult(contacts, companies);
     }
     

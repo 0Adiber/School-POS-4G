@@ -2,16 +2,16 @@ package at.htlkaindorf.controller;
 
 import at.htlkaindorf.beans.Gender;
 import at.htlkaindorf.beans.Sortings;
+import at.htlkaindorf.bl.DynamicContactComparator;
 import at.htlkaindorf.io.IOAccess;
 import at.htlkaindorf.pojos.Company;
 import at.htlkaindorf.pojos.Contact;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -21,7 +21,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import lombok.Data;
 
 @WebServlet(urlPatterns = {"/ContactController"})
 public class ContactController extends HttpServlet {
@@ -85,6 +84,7 @@ public class ContactController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setAttribute("contacts", contacts);
+        request.getSession().invalidate();
         processRequest(request, response);
     }
 
@@ -107,9 +107,10 @@ public class ContactController extends HttpServlet {
         ********************/
         //COMPANY
         try {
-            Company curcompany = companies.stream().filter(c -> c.getName().equals(request.getParameter("company"))).findFirst().get();
-            curcontacts = curcontacts.stream().filter(c -> c.getCompany().equals(curcompany)).collect(Collectors.toList()); 
-        request.setAttribute("curcompany", curcompany);
+            Company curcompany = companies.stream().filter(c -> c.getName().concat(c.getStockmarket()).equals(request.getParameter("company"))).findFirst().get();
+            //curcontacts = curcontacts.stream().filter(c -> c.getCompany().equals(curcompany)).collect(Collectors.toList()); 
+            curcontacts = new ArrayList<>(curcompany.getContacts());
+            request.setAttribute("curcompany", curcompany);
         }catch(NoSuchElementException e) {
         }
         //GENDER
@@ -135,23 +136,17 @@ public class ContactController extends HttpServlet {
         for(Sortings s : Sortings.values()) {
             final String param = request.getParameter("sort_" + s);
             if(param != null) {
-                sortings.add(s);
+                if(!sortings.contains(s))
+                    sortings.add(s);
             } else {
                 sortings.remove(s);
             }
         }
         
-        //ONLY SORTS FOR ONE OF THE THINSG -- have to figure out how to sort dynamically for serveral things
-        for(Sortings s : sortings) {
-            switch(s) {
-                case ID: curcontacts.sort(Comparator.comparing(Contact::getId)); break;
-                case FIRSTNAME: curcontacts.sort(Comparator.comparing(Contact::getFirstname)); break;
-                case LASTNAME: curcontacts.sort(Comparator.comparing(Contact::getLastname)); break;
-                case GENDER: curcontacts.sort(Comparator.comparing(Contact::getGender)); break;
-                case BIRTH: curcontacts.sort(Comparator.comparing(Contact::getDateOfBirth)); break;
-                case COMPANY: curcontacts.sort(Comparator.comparing(Contact::getCompany)); break;
-            }
-        }
+        System.out.println(sortings.toString());
+        
+        //sort using the sortings
+        Collections.sort(curcontacts,new DynamicContactComparator(sortings));
         
         request.getSession().setAttribute("sort", sortings);
         request.getSession().setAttribute("sortStr", sortings.toString()); //because we are only allowed to use JSTL, and JSTL cannot use enums, i have to do this like that
