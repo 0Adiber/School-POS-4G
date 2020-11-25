@@ -22,7 +22,10 @@ public class CompanyDeserializer extends StdDeserializer<Company>{
         final Company company = jp.readValueAs(Company.class);
         
         companies.add(company);
-        return companies.stream().filter(c -> c.equals(company)).findFirst().get();
+        return companies.stream()
+                        .filter(c -> c.equals(company))
+                        .findFirst()
+                        .get();
     }
     
 }

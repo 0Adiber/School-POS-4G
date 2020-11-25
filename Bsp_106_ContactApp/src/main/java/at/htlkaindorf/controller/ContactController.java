@@ -53,6 +53,8 @@ public class ContactController extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        //Pagination
         int page;
         List<Contact> curcontacts = (List<Contact>) request.getAttribute("contacts");
         try {
@@ -61,7 +63,6 @@ public class ContactController extends HttpServlet {
         }catch(NumberFormatException ex) {
             page = 0;
         }
-        
         curcontacts = curcontacts.stream().skip(page*30).limit(30).collect(Collectors.toList());
         
         request.setAttribute("contacts", curcontacts);

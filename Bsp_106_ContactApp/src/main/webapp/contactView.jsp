@@ -37,12 +37,12 @@
         
             <table>
                 <tr>
-                    <th>ID <input type="checkbox" name="sort_<%= Sortings.ID %>" onChange="submit();" ${sortStr.contains("ID") ? 'checked':''}/></th>
-                    <th>Firstname <input type="checkbox" name="sort_<%= Sortings.FIRSTNAME %>" onChange="submit();" ${sortStr.contains("FIRSTNAME") ? 'checked':''}/></th>
-                    <th>Lastname <input type="checkbox" name="sort_<%= Sortings.LASTNAME %>" onChange="submit();" ${sortStr.contains("LASTNAME") ? 'checked':''}/></th>
-                    <th>Gender <input type="checkbox" name="sort_<%= Sortings.GENDER %>" onChange="submit();" ${sortStr.contains("GENDER") ? 'checked':''}/></th>
-                    <th>Date of Birth <input type="checkbox" name="sort_<%= Sortings.BIRTH %>" onChange="submit();" ${sortStr.contains("BIRTH") ? 'checked':''}/></th>
-                    <th>Company <input type="checkbox" name="sort_<%= Sortings.COMPANY %>" onChange="submit();" ${sortStr.contains("COMPANY") ? 'checked':''}/></th>
+                    <th>ID <input type="checkbox" name="sort_ID" onChange="submit();" ${sortStr.contains("ID") ? 'checked':''}/></th>
+                    <th>Firstname <input type="checkbox" name="sort_FIRSTNAME" onChange="submit();" ${sortStr.contains("FIRSTNAME") ? 'checked':''}/></th>
+                    <th>Lastname <input type="checkbox" name="sort_LASTNAME" onChange="submit();" ${sortStr.contains("LASTNAME") ? 'checked':''}/></th>
+                    <th>Gender <input type="checkbox" name="sort_GENDER" onChange="submit();" ${sortStr.contains("GENDER") ? 'checked':''}/></th>
+                    <th>Date of Birth <input type="checkbox" name="sort_BIRTH" onChange="submit();" ${sortStr.contains("BIRTH") ? 'checked':''}/></th>
+                    <th>Company <input type="checkbox" name="sort_COMPANY" onChange="submit();" ${sortStr.contains("COMPANY") ? 'checked':''}/></th>
                     <th>E-Mail</th>
                 </tr>
                 <c:forEach var="c" items="${contacts}">
