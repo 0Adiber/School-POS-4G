@@ -1,4 +1,4 @@
-package bl;
+package at.htlkaindorf.json;
 
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import at.htlkaindorf.pojos.Company;

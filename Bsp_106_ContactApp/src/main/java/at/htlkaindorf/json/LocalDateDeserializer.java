@@ -1,5 +1,5 @@
 
-package bl;
+package at.htlkaindorf.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;

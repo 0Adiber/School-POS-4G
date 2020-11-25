@@ -2,8 +2,8 @@ package at.htlkaindorf.controller;
 
 import at.htlkaindorf.beans.Gender;
 import at.htlkaindorf.beans.Sortings;
-import at.htlkaindorf.bl.DynamicContactComparator;
-import at.htlkaindorf.io.IOAccess;
+import at.htlkaindorf.json.DynamicContactComparator;
+import at.htlkaindorf.io.JSONAccess;
 import at.htlkaindorf.pojos.Company;
 import at.htlkaindorf.pojos.Contact;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class ContactController extends HttpServlet {
         super.init(config);
         
         try {
-            IOAccess.ReadResult rs = IOAccess.readJson(config.getServletContext().getRealPath("/contacts.json"));
+            JSONAccess.ReadResult rs = JSONAccess.readJson(config.getServletContext().getRealPath("/contacts.json"));
             contacts = rs.getContacts();
             companies = rs.getCompanies().stream().sorted(Comparator.comparing(Company::getName).thenComparing(Company::getStockmarket)).collect(Collectors.toList());
         } catch (IOException ex) {

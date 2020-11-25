@@ -2,7 +2,7 @@ package at.htlkaindorf.io;
 
 import at.htlkaindorf.pojos.Company;
 import at.htlkaindorf.pojos.Contact;
-import bl.CompanyDeserializer;
+import at.htlkaindorf.json.CompanyDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.Data;
 
-public class IOAccess {
+public class JSONAccess {
     
     @Data
     public final static class ReadResult {

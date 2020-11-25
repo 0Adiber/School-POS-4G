@@ -1,4 +1,4 @@
-package at.htlkaindorf.bl;
+package at.htlkaindorf.json;
 
 import at.htlkaindorf.beans.Sortings;
 import at.htlkaindorf.pojos.Contact;
