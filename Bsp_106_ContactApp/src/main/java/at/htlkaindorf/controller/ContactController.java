@@ -56,10 +56,10 @@ public class ContactController extends HttpServlet {
         
         //Pagination
         int page;
-        List<Contact> curcontacts = (List<Contact>) request.getAttribute("contacts");
+        List<Contact> curcontacts = (List<Contact>) request.getSession().getAttribute("contacts");
         try {
             page = Integer.parseInt(request.getParameter("page"));
-            page = page < 1 ? 0 : Math.ceil(((List<Contact>)request.getAttribute("contacts")).size()/30) >= page ? page : page-1;
+            page = page < 1 ? 0 : Math.ceil(curcontacts.size()/30) >= page ? page : page-1;
         }catch(NumberFormatException ex) {
             page = 0;
         }
@@ -84,8 +84,8 @@ public class ContactController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setAttribute("contacts", contacts);
         request.getSession().invalidate();
+        request.getSession().setAttribute("contacts", contacts);
         processRequest(request, response);
     }
 
@@ -101,7 +101,7 @@ public class ContactController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        List<Contact> curcontacts = new ArrayList<>(contacts);
+        List<Contact> curcontacts = (List<Contact>)request.getSession().getAttribute("contacts");
         
         /*******************
               FILTERING
@@ -143,15 +143,13 @@ public class ContactController extends HttpServlet {
                 sortings.remove(s);
             }
         }
-        
-        System.out.println(sortings.toString());
-        
+                
         //sort using the sortings
         Collections.sort(curcontacts,new DynamicContactComparator(sortings));
         
         request.getSession().setAttribute("sort", sortings);
         request.getSession().setAttribute("sortStr", sortings.toString()); //because we are only allowed to use JSTL, and JSTL cannot use enums, i have to do this like that
-        request.setAttribute("contacts", curcontacts);
+        request.getSession().setAttribute("contacts", curcontacts);
         
         processRequest(request, response);
     }
