@@ -35,7 +35,9 @@ public class ContactController extends HttpServlet {
         try {
             JSONAccess.ReadResult rs = JSONAccess.readJson(config.getServletContext().getRealPath("/contacts.json"));
             contacts = rs.getContacts();
-            companies = rs.getCompanies().stream().sorted(Comparator.comparing(Company::getName).thenComparing(Company::getStockmarket)).collect(Collectors.toList());
+            companies = rs.getCompanies().stream()
+                    .sorted(Comparator.comparing(Company::getName).thenComparing(Company::getStockmarket))
+                    .collect(Collectors.toList());
         } catch (IOException ex) {
             Logger.getLogger(ContactController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -63,7 +65,10 @@ public class ContactController extends HttpServlet {
         }catch(NumberFormatException ex) {
             page = 0;
         }
-        curcontacts = curcontacts.stream().skip(page*30).limit(30).collect(Collectors.toList());
+        curcontacts = curcontacts.stream()
+                .skip(page*30)
+                .limit(30)
+                .collect(Collectors.toList());
         
         request.setAttribute("contacts", curcontacts);
         request.setAttribute("page", page);
@@ -84,8 +89,10 @@ public class ContactController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getSession().invalidate();
-        request.getSession().setAttribute("contacts", contacts);
+        if(request.getSession().getAttribute("contacts") == null) {
+            request.getSession().setAttribute("contacts", contacts);
+            request.getSession().setAttribute("session_contacts", contacts);
+        }
         processRequest(request, response);
     }
 
@@ -101,14 +108,31 @@ public class ContactController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        List<Contact> curcontacts = (List<Contact>)request.getSession().getAttribute("contacts");
+        List<Contact> curcontacts = new ArrayList<>((List<Contact>)request.getSession().getAttribute("session_contacts"));
+        
+        /*******************
+               DELETING
+        ********************/
+        if(request.getParameter("action") != null && request.getParameter("action").equalsIgnoreCase("delete")) {
+            for(int i = 0; i<30; i++) {
+                try {
+                    int cid = Integer.parseInt(request.getParameter("c_list_" + i));
+                    curcontacts.removeIf(c -> c.getId() == cid);
+                }catch(NumberFormatException e) {}
+            }
+            request.getSession().setAttribute("session_contacts", curcontacts);
+        }
+        
         
         /*******************
               FILTERING
         ********************/
         //COMPANY
         try {
-            Company curcompany = companies.stream().filter(c -> c.getName().concat(c.getStockmarket()).equals(request.getParameter("company"))).findFirst().get();
+            Company curcompany = companies.stream()
+                    .filter(c -> c.getName().concat(c.getStockmarket()).equals(request.getParameter("company")))
+                    .findFirst()
+                    .get();
             //curcontacts = curcontacts.stream().filter(c -> c.getCompany().equals(curcompany)).collect(Collectors.toList()); 
             curcontacts = new ArrayList<>(curcompany.getContacts());
             request.setAttribute("curcompany", curcompany);
@@ -117,20 +141,25 @@ public class ContactController extends HttpServlet {
         //GENDER
         try {
             Gender curgender = Gender.valueOf(request.getParameter("gender"));
-            curcontacts = curcontacts.stream().filter(c -> c.getGender().equals(curgender)).collect(Collectors.toList()); 
+            curcontacts = curcontacts.stream()
+                    .filter(c -> c.getGender().equals(curgender))
+                    .collect(Collectors.toList()); 
             request.setAttribute("curgender", curgender);
         }catch(IllegalArgumentException | NullPointerException e) {
         }
         //NAME
         String name = request.getParameter("fname");
         if(name != null && !name.trim().isEmpty()) {
-            curcontacts = curcontacts.stream().filter(c -> c.getFirstname().concat(" "+c.getLastname()).toLowerCase().contains(name.toLowerCase())).collect(Collectors.toList());
+            curcontacts = curcontacts.stream()
+                    .filter(c -> c.getFirstname().concat(" "+c.getLastname()).toLowerCase().contains(name.toLowerCase()))
+                    .collect(Collectors.toList());
             request.setAttribute("curname", name);
         }
         
         /*******************
               SORTING
         ********************/
+        //first find all sortings
         List<Sortings> sortings = (List<Sortings>)request.getSession().getAttribute("sort");
         if(sortings == null)
             sortings = new ArrayList<>();
@@ -144,7 +173,7 @@ public class ContactController extends HttpServlet {
             }
         }
                 
-        //sort using the sortings
+        //now sort using the sortings
         Collections.sort(curcontacts,new DynamicContactComparator(sortings));
         
         request.getSession().setAttribute("sort", sortings);

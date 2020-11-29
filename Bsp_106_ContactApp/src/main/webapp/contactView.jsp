@@ -37,6 +37,7 @@
         
             <table>
                 <tr>
+                    <th></th>
                     <th>ID <input type="checkbox" name="sort_ID" onChange="submit();" ${sortStr.contains("ID") ? 'checked':''}/></th>
                     <th>Firstname <input type="checkbox" name="sort_FIRSTNAME" onChange="submit();" ${sortStr.contains("FIRSTNAME") ? 'checked':''}/></th>
                     <th>Lastname <input type="checkbox" name="sort_LASTNAME" onChange="submit();" ${sortStr.contains("LASTNAME") ? 'checked':''}/></th>
@@ -45,8 +46,10 @@
                     <th>Company <input type="checkbox" name="sort_COMPANY" onChange="submit();" ${sortStr.contains("COMPANY") ? 'checked':''}/></th>
                     <th>E-Mail</th>
                 </tr>
+                <c:set var="i" value="0" />
                 <c:forEach var="c" items="${contacts}">
                     <tr>
+                        <td><input type="checkbox" value="${c.id}" name="c_list_${i}"/></td>
                         <td>${c.id}</td>
                         <td>${c.firstname}</td>
                         <td>${c.lastname}</td>
@@ -61,12 +64,16 @@
                             </select>
                         </td>
                     </tr>
+                    <c:set var="i" value="${i+1}" />
                 </c:forEach>
             </table>
             
             <button type="submit" name="page" value="${page-1}">&lt;</button>
             <span>${page+1}</span>
             <button type="submit" name="page" value="${page+1}">&gt;</button>
+            <br>
+            <button type="submit" name="action" value="delete">Delete</button>
+            <button type="submit" name="action" value="favorite">Make favorite</button>
         </form>
     </body>
 </html>
