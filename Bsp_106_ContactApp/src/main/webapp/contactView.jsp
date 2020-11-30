@@ -63,6 +63,11 @@
                                 </c:forEach>
                             </select>
                         </td>
+                        <c:if test="${c.favorite == true}">
+                            <td>
+                                <img src="star.svg" height="20px" />
+                            </td>
+                        </c:if>
                     </tr>
                     <c:set var="i" value="${i+1}" />
                 </c:forEach>
@@ -74,6 +79,8 @@
             <br>
             <button type="submit" name="action" value="delete">Delete</button>
             <button type="submit" name="action" value="favorite">Make favorite</button>
+            <br>
+            <button type="submit" name="action" value="savefavorite">Save favorite</button>
         </form>
     </body>
 </html>

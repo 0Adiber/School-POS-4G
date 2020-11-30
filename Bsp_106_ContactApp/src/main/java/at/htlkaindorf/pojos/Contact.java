@@ -3,6 +3,7 @@ package at.htlkaindorf.pojos;
 import at.htlkaindorf.beans.Gender;
 import at.htlkaindorf.json.CompanyDeserializer;
 import at.htlkaindorf.json.LocalDateDeserializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -21,4 +22,6 @@ public class Contact {
     private LocalDate dateOfBirth;
     @JsonDeserialize(using = CompanyDeserializer.class)
     private Company company;
+    @JsonIgnore
+    boolean favorite;
 }

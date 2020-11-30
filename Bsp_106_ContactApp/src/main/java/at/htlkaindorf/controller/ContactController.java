@@ -123,6 +123,24 @@ public class ContactController extends HttpServlet {
             request.getSession().setAttribute("session_contacts", curcontacts);
         }
         
+        /*******************
+               FAVORITE
+        ********************/
+        if(request.getParameter("action") != null && request.getParameter("action").equalsIgnoreCase("favorite")) {
+            for(int i = 0; i<30; i++) {
+                try {
+                    int cid = Integer.parseInt(request.getParameter("c_list_" + i));
+                    curcontacts.stream().filter(c -> c.getId() == cid).findFirst().get().setFavorite(true);
+                }catch(NumberFormatException e) {}
+            }
+        }
+        
+        /*******************
+            PRINT FAVORITE
+        ********************/
+        if(request.getParameter("action") != null && request.getParameter("action").equalsIgnoreCase("savefavorite")) {
+            //TODO
+        }
         
         /*******************
               FILTERING
