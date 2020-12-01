@@ -19,7 +19,7 @@ public class JSONAccess {
         private final Set<Company> companies;
     }
     
-    private static ObjectMapper mapper = new ObjectMapper();
+    private static final ObjectMapper mapper = new ObjectMapper();
     
     public static ReadResult readJson(String path) throws IOException {
         
@@ -37,6 +37,13 @@ public class JSONAccess {
         }
         
         return new ReadResult(contacts, companies);
+    }
+    
+    public static String saveJson(String path, String session, List<Contact> contacts) throws IOException {
+        File f = new File(path, session+".json");
+        System.out.println(path);
+        mapper.writeValue(f, contacts);
+        return "favorites/" + session + ".json";
     }
     
 }

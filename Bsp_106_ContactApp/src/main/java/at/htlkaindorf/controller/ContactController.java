@@ -130,16 +130,24 @@ public class ContactController extends HttpServlet {
             for(int i = 0; i<30; i++) {
                 try {
                     int cid = Integer.parseInt(request.getParameter("c_list_" + i));
-                    curcontacts.stream().filter(c -> c.getId() == cid).findFirst().get().setFavorite(true);
+                    curcontacts.stream()
+                              .filter(c -> c.getId() == cid)
+                              .findFirst()
+                              .get().setFavorite(true);
                 }catch(NumberFormatException e) {}
             }
         }
         
         /*******************
-            PRINT FAVORITE
+            SAVE FAVORITE
         ********************/
         if(request.getParameter("action") != null && request.getParameter("action").equalsIgnoreCase("savefavorite")) {
-            //TODO
+            List<Contact> save = curcontacts.stream()
+                      .filter(c -> c.isFavorite())
+                      .collect(Collectors.toList());
+            String path = JSONAccess.saveJson(getServletContext().getRealPath("favorites"), request.getSession().getId(), save);
+            response.sendRedirect(path);
+            return;
         }
         
         /*******************

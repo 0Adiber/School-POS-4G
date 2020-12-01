@@ -23,7 +23,7 @@
             <label for="gender">
                 <p>Gender: </p>
                 <select name="gender">
-                    <option value="NONE">NONE</option>
+                    <option value="NONE">ALL</option>
                     <c:forEach var="g" items="${genders}">
                         <option value="${g}" ${curgender == g ? 'selected' : ''}>${g}</option>
                     </c:forEach>
