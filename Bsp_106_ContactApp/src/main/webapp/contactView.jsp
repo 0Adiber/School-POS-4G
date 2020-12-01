@@ -14,7 +14,7 @@
             <label for="company">
                 <p>Company: </p>
                 <select name="company">
-                    <option value="NONE">NONE</option>
+                    <option value="NONE">ALL</option>
                     <c:forEach var="c" items="${companies}">
                         <option value="${c.name}${c.stockmarket}" ${curcompany == c ? 'selected' : ''}>${c.name} - ${c.stockmarket}</option>
                     </c:forEach>
