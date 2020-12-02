@@ -7,6 +7,8 @@ import at.htlkaindorf.io.JSONAccess;
 import at.htlkaindorf.pojos.Company;
 import at.htlkaindorf.pojos.Contact;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -142,11 +144,17 @@ public class ContactController extends HttpServlet {
             SAVE FAVORITE
         ********************/
         if(request.getParameter("action") != null && request.getParameter("action").equalsIgnoreCase("savefavorite")) {
+            response.setHeader("Content-Disposition", "attachment;filename=favorites.json");
             List<Contact> save = curcontacts.stream()
                       .filter(c -> c.isFavorite())
                       .collect(Collectors.toList());
-            String path = JSONAccess.saveJson(getServletContext().getRealPath("favorites"), request.getSession().getId(), save);
-            response.sendRedirect(path);
+            byte[] f = JSONAccess.saveJson(save);
+            
+            OutputStream out = response.getOutputStream();
+            for(byte b : f) {
+                out.write(b);
+            }
+            out.flush();
             return;
         }
         

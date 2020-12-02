@@ -4,8 +4,12 @@ import at.htlkaindorf.pojos.Company;
 import at.htlkaindorf.pojos.Contact;
 import at.htlkaindorf.json.CompanyDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -39,11 +43,8 @@ public class JSONAccess {
         return new ReadResult(contacts, companies);
     }
     
-    public static String saveJson(String path, String session, List<Contact> contacts) throws IOException {
-        File f = new File(path, session+".json");
-        System.out.println(path);
-        mapper.writeValue(f, contacts);
-        return "favorites/" + session + ".json";
+    public static byte[] saveJson(List<Contact> contacts) throws IOException {
+        return mapper.writeValueAsBytes(contacts);
     }
     
 }
