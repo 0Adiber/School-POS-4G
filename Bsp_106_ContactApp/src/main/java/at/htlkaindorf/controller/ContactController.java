@@ -59,19 +59,23 @@ public class ContactController extends HttpServlet {
             throws ServletException, IOException {
         
         //Pagination
-        int page;
+        int page, max;
         List<Contact> curcontacts = (List<Contact>) request.getSession().getAttribute("contacts");
         try {
             page = Integer.parseInt(request.getParameter("page"));
             page = page < 1 ? 0 : Math.ceil(curcontacts.size()/30) >= page ? page : page-1;
+            
         }catch(NumberFormatException ex) {
             page = 0;
         }
+        max = (int)Math.ceil(curcontacts.size()/30);
+        
         curcontacts = curcontacts.stream()
                 .skip(page*30)
                 .limit(30)
                 .collect(Collectors.toList());
         
+        request.setAttribute("maxpage", max);
         request.setAttribute("contacts", curcontacts);
         request.setAttribute("page", page);
         request.setAttribute("companies", companies);
@@ -166,9 +170,15 @@ public class ContactController extends HttpServlet {
             Company curcompany = companies.stream()
                     .filter(c -> c.getName().concat(c.getStockmarket()).equals(request.getParameter("company")))
                     .findFirst()
-                    .get();
-            //curcontacts = curcontacts.stream().filter(c -> c.getCompany().equals(curcompany)).collect(Collectors.toList()); 
-            curcontacts = new ArrayList<>(curcompany.getContacts());
+                    .get(); 
+            //curcontacts = new ArrayList<>(curcompany.getContacts()); 
+                // => Prof SF meinte zwar wir sollen das so machen, aber dann würden alle gelöschten kontakte ignoriert
+                // und wenn man da jetzt dann drüber iterieren würde, dann macht das eh keinen unterschied zu dem streaming ausdruck unten
+            
+            curcontacts = curcontacts.stream()
+                    .filter(c -> c.getCompany().equals(curcompany))
+                    .collect(Collectors.toList()); 
+            
             request.setAttribute("curcompany", curcompany);
         }catch(NoSuchElementException e) {
         }
