@@ -14,14 +14,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 @WebServlet(name = "MovieController", urlPatterns = {"/MovieController"})
 public class MovieController extends HttpServlet {
 
     private final String APIKEY = "82fd3ad1";
-    private final String URL = "http://www.omdbapi.com/?apikey="+APIKEY;
+    private final String URL = "http://www.omdbapi.com/?apikey=" + APIKEY;
     private static JsonMapper mapper = new JsonMapper();
-    
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -32,22 +31,27 @@ public class MovieController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-              throws ServletException, IOException {
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        String search = "Galaxy";
-        int page = 1;
-        
-        JsonNode sNode = mapper.readTree(new URL(URL+"&s="+search+"&p="+page));
+
+        String search = request.getParameter("search");
+        if (search != null && !search.trim().isEmpty()) {
+            int page = 1;
+
+            JsonNode sNode = mapper.readTree(new URL(URL + "&s=" + search + "&p=" + page));
+
+            List<Movie> movies = new ArrayList<>();
+
+            for (int i = 0; i < 10; i++) {
+                JsonNode rNode = sNode.get("Search").get(i);
+                String id = rNode.get("imdbID").asText();
                 
-        List<Movie> movies = new ArrayList<>();
-        
-        for(int i = 0; i<10; i++) {
-            JsonNode rNode = sNode.get("Search").get(i);
-            String id = rNode.get("imdbID").asText();
-            movies.add(mapper.readValue(new URL(URL+"&i="+id), Movie.class));
+                movies.add(mapper.readValue(new URL(URL + "&i=" + id), Movie.class));
+            }
+            
+            request.setAttribute("movies", movies);
         }
-        
+
         request.getRequestDispatcher("movieView.jsp").forward(request, response);
     }
 
@@ -62,7 +66,7 @@ public class MovieController extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-              throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
@@ -76,7 +80,7 @@ public class MovieController extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-              throws ServletException, IOException {
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
