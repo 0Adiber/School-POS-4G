@@ -23,16 +23,19 @@
                         <img class="poster" src="${m.poster}" />
                         <div class="movie-info">
                             <p class="title">${m.title}</p>
+                            <p class="year">${m.year}</p>
                         </div>
                     </div>
                 </li>
             </c:forEach>
         </ul>
 
-        <!-- <button name="page" value="${page-1}">-</button>
-        <span>${page}/${maxpage}</span>
-        <button name="page" value="${page+1}">+</button> -->
-                    
+        <form action="./" method="POST">
+            <button name="page" value="${page-1}" type="submit">-</button>
+            <span>${page}/${maxpage}</span>
+            <button name="page" value="${page+1}" type="submit">+</button>
+        </form>
+                            
         <form action="./" method="POST">
             <button type="submit" name="curres" value="${curres+1}">load more</button> 
         </form>

@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -34,52 +35,61 @@ public class MovieController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
+        
+        //MOVIES
+        List<Movie> movies = (List<Movie>)request.getSession().getAttribute("movies");
+        if(movies == null) {
+            movies = new ArrayList<>();
+        }
+        
+        /*
+        * IF SEARCH OR LOADMORE
+        */
         String search = (String)request.getAttribute("search");
+        
         if (search != null && !search.trim().isEmpty()) {
             search = search.trim();
             request.getSession().setAttribute("search", search);
-            /*int page;
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-                int maxpage = (int)request.getSession().getAttribute("maxpage");
-                assert page >= 1 && page <= maxpage;
-            }catch(NumberFormatException | AssertionError e) {
-                page = 1;
-            }*/
-            
+                        
             int curres;
             try {
-                System.out.println("curres: " + request.getParameter("curres"));
                 curres = Integer.parseInt(request.getParameter("curres"));
             }catch(NumberFormatException e) {
                 curres = 1;
             }
             
             JsonNode sNode = mapper.readTree(new URL(URL + "&s=" + URLEncoder.encode(search) + "&page=" + curres)); //.encode(<String>) is deprecated in Java14, but not Java8
-
-            List<Movie> movies = (List<Movie>)request.getSession().getAttribute("movies");
-            if(movies == null || (request.getSession().getAttribute("search") != null && request.getSession().getAttribute("search") != search)) {
-                movies = new ArrayList<>();
-            }
             
             try {
-                sNode.get("Error").asText();
-            }catch(NullPointerException e) {
                 for (int i = 0; i < 10; i++) {
-                    JsonNode rNode = sNode.get("Search").get(i);
-                    String id = rNode.get("imdbID").asText();
-
+                    //movies.add(mapper.treeToValue(sNode.get("Search").get(i),Movie.class)); // ==> cannot use this, because we have to be able to filter for genre, which is only visible when requesting the detailed information
+                    
+                    JsonNode rNode = sNode.get("Search").get(i); 
+                   String id = rNode.get("imdbID").asText();
                     movies.add(mapper.readValue(new URL(URL + "&i=" + id), Movie.class));
                 }
+            }catch(NullPointerException e) {
+                //no more results
             }
             
             request.getSession().setAttribute("movies", movies);
             request.getSession().setAttribute("curres", curres);
-            //request.getSession().setAttribute("page", page);
-            //request.getSession().setAttribute("maxpage", Math.floorDiv(sNode.get("totalResults").asInt(),10));
         }
-
+        
+        /*
+        * PAGINATION
+        */
+        int page, maxpage = (int)Math.ceil(movies.size()/20.0);;
+        try {
+            page = Integer.parseInt(request.getParameter("page"));
+            page = page < 1 ? 1 : page > maxpage ? maxpage : page;
+        }catch(NumberFormatException e) {
+            page = 1;
+        }
+        
+        request.setAttribute("movies", movies.stream().skip((page-1)*20).limit(20).collect(Collectors.toList()));
+        request.setAttribute("page", page);
+        request.getSession().setAttribute("maxpage", maxpage);
         request.getRequestDispatcher("movieView.jsp").forward(request, response);
     }
 
@@ -111,7 +121,7 @@ public class MovieController extends HttpServlet {
         if(request.getParameter("search") != null) {
             request.getSession().invalidate();
             request.setAttribute("search", request.getParameter("search"));
-        } else {
+        } else if(request.getParameter("curres") != null){
             request.setAttribute("search", request.getSession().getAttribute("search"));
         }
         processRequest(request, response);
