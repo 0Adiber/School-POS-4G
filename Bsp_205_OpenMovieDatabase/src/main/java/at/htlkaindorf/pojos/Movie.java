@@ -7,15 +7,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@EqualsAndHashCode
 public class Movie {
     @JsonProperty("Title")
     private String title;
+    @JsonProperty("Type")
+    private String type;
     @JsonProperty("Runtime")
     private String runtime;
     @JsonProperty("Year")
@@ -30,20 +34,19 @@ public class Movie {
     private String plot;
     @JsonProperty("Poster")
     private String poster;
+    @JsonProperty("imdbID")
+    @EqualsAndHashCode.Include
     private String imdbID;
     @JsonProperty("Director")
-    @JsonDeserialize(using = ArrayDeserializer.class)
-    private String[] director;
+    private String director;
     @JsonProperty("Genre")
     @JsonDeserialize(using = ArrayDeserializer.class)
     private String[] genre;
     @JsonProperty("Writer")
-    @JsonDeserialize(using = ArrayDeserializer.class)
-    private String[] writer;
+    private String writer;
     @JsonProperty("Actors")
-    @JsonDeserialize(using = ArrayDeserializer.class)
-    private String[] actors;
+    private String actors;
     @JsonProperty("Ratings")
     private Rating[] ratings;
-
+    
 }

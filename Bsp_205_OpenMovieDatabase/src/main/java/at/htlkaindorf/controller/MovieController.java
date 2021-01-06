@@ -66,7 +66,7 @@ public class MovieController extends HttpServlet {
                     
                     JsonNode rNode = sNode.get("Search").get(i); 
                    String id = rNode.get("imdbID").asText();
-                    movies.add(mapper.readValue(new URL(URL + "&i=" + id), Movie.class));
+                    movies.add(mapper.readValue(new URL(URL + "&plot=full&i=" + id), Movie.class));
                 }
             }catch(NullPointerException e) {
                 //no more results
@@ -75,7 +75,7 @@ public class MovieController extends HttpServlet {
             request.getSession().setAttribute("movies", movies);
             request.getSession().setAttribute("curres", curres);
         }
-        
+                
         /*
         * PAGINATION
         */

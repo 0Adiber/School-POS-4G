@@ -11,4 +11,6 @@ public class Rating {
     private String source;
     @JsonProperty("Value")
     private String value;
+    
+    
 }

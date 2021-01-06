@@ -44,11 +44,10 @@ ul {
 .movie-small {
     display: flex;
     flex-direction: row;
-    height: 150px;
 }
 
 .poster {
-    height: 100%;
+    height: 150px;
 }
 
 .movie-info {
@@ -67,4 +66,61 @@ h1 {
     color: white;
     font-family: 'Nerko One', cursive;
     font-size: 3em;
+}
+
+.details {
+    position: relative;
+    padding: 50px;
+}
+
+.details h3 {
+    font-size: 30px;
+    text-align: center;
+}
+
+.details .img {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.details .img img{
+    position: absolute;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.details table {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.details table th {
+    background-color: #0575E6;
+    color: white;
+    padding: 10px;
+    font-weight: normal;
+    position: relative;
+}
+
+.details table td {
+    padding: 5px;
+    text-align: center;
+}
+
+.details table td:first-child {
+    text-align: start;
+}
+
+.details table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.details table th:last-child {
+    border-top-right-radius: 10px;
 }
