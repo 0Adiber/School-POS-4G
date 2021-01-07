@@ -1,6 +1,8 @@
 package at.htlkaindorf.controller;
 
+import at.htlkaindorf.json.DynamicMovieComparator;
 import at.htlkaindorf.pojos.Movie;
+import beans.Sortings;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.io.IOException;
@@ -8,7 +10,11 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,9 +43,11 @@ public class MovieController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         
         //MOVIES
-        List<Movie> movies = (List<Movie>)request.getSession().getAttribute("movies");
-        if(movies == null) {
-            movies = new ArrayList<>();
+        List<Movie> movies = new ArrayList<>();
+        try {
+            movies.addAll((List<Movie>)request.getSession().getAttribute("movies"));
+        }catch(NullPointerException e) {
+            
         }
         
         /*
@@ -65,16 +73,60 @@ public class MovieController extends HttpServlet {
                     //movies.add(mapper.treeToValue(sNode.get("Search").get(i),Movie.class)); // ==> cannot use this, because we have to be able to filter for genre, which is only visible when requesting the detailed information
                     
                     JsonNode rNode = sNode.get("Search").get(i); 
-                   String id = rNode.get("imdbID").asText();
+                    String id = rNode.get("imdbID").asText();
                     movies.add(mapper.readValue(new URL(URL + "&plot=full&i=" + id), Movie.class));
                 }
             }catch(NullPointerException e) {
                 //no more results
             }
             
+            //genres
+            Set<String> genres = new HashSet<>();
+            for(Movie m : movies) {
+                genres.addAll(Arrays.asList(m.getGenre()));
+            }
+            request.getSession().setAttribute("genres", genres);
+            
             request.getSession().setAttribute("movies", movies);
             request.getSession().setAttribute("curres", curres);
         }
+        
+        /*******************
+              FILTERING
+        ********************/
+        String temp = (String) request.getParameter("filter");
+        if(temp == null)
+            temp = (String)request.getSession().getAttribute("filter");
+        
+        final String filter = temp;
+        
+        if(filter != null && !filter.equalsIgnoreCase("all")) {
+            movies = movies.stream()
+                      .filter(m -> Arrays.asList(m.getGenre()).contains(filter))
+                      .collect(Collectors.toList());
+        }
+        request.getSession().setAttribute("filter", filter);
+        
+        /*******************
+              SORTING
+        ********************/
+        List<Sortings> sortings = (List<Sortings>)request.getSession().getAttribute("sort");
+        if(sortings == null)
+            sortings = new ArrayList<>();
+        for(Sortings s : Sortings.values()) {
+            final String param = request.getParameter("sort_" + s);
+            if(param != null) {
+                if(!sortings.contains(s))
+                    sortings.add(s);
+            } else {
+                sortings.remove(s);
+            }
+        }
+        //now sort using the sortings
+        Collections.sort(movies,new DynamicMovieComparator(sortings));
+        
+        request.getSession().setAttribute("sort", sortings);
+        request.getSession().setAttribute("sortStr", sortings.toString()); //because we are only allowed to use JSTL, and JSTL cannot use enums, i have to do this like that
                 
         /*
         * PAGINATION
