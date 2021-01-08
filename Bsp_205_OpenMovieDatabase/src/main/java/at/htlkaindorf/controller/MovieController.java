@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -81,10 +82,11 @@ public class MovieController extends HttpServlet {
             }
             
             //genres
-            Set<String> genres = new HashSet<>();
+            Set<String> genres = new TreeSet<>();
             for(Movie m : movies) {
                 genres.addAll(Arrays.asList(m.getGenre()));
             }
+            
             request.getSession().setAttribute("genres", genres);
             
             request.getSession().setAttribute("movies", movies);

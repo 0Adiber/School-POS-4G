@@ -12,26 +12,30 @@
         <h1>Movie Search</h1>
         <p>Funktion: Suche -> 10 results; load more -> liefert die nächsten 10; pagination mit 20 / seite (falls genügend geladen); filter & sort auf ganze geladene liste; sort in der reihenfolge, in der angeklickt</p>
         
-        <form action="./" method="POST">
-            <input type="text" name="search" />
-            <button type="submit">Search!</button>
-        </form>
+        <div id="form-search-outer">
+            <form action="./" method="POST" id="form-search">
+                <input type="text" name="search" />
+                <button type="submit">Search!</button>
+            </form>
+        </div>
         
         <form action="./" method="POST">
-            <select name="filter" onchange="submit();">
-                <option value="all">All</option>
-                <c:forEach items="${genres}" var="g">
-                    <c:if test="${g == filter}">
-                        <option value="${g}" selected>${g}</option>
-                    </c:if>
-                    <option value="${g}">${g}</option>
-                </c:forEach>
-            </select>
-            <div>
-                <p>Title</p><input type="checkbox" name="sort_TITLE" onchange="submit();" ${sortStr.contains("TITLE") ? 'checked' : ''} />
-                <p>Release Date</p><input type="checkbox" name="sort_DATE" onchange="submit();" ${sortStr.contains("DATE") ? 'checked' : ''} />
+            <div id="controls" class="${movies.size() == 0 ? 'hidden' : ''}">
+                <div id="controls-inner">
+                    <select name="filter" onchange="submit();">
+                        <option value="all">All</option>
+                        <c:forEach items="${genres}" var="g">
+                            <c:if test="${g == filter}">
+                                <option value="${g}" selected>${g}</option>
+                            </c:if>
+                            <option value="${g}">${g}</option>
+                        </c:forEach>
+                    </select>
+                    <p>Title <input type="checkbox" name="sort_TITLE" onchange="submit();" ${sortStr.contains("TITLE") ? 'checked' : ''} /></p>
+                    <p>Release Date <input type="checkbox" name="sort_DATE" onchange="submit();" ${sortStr.contains("DATE") ? 'checked' : ''} /></p>
+                </div>
             </div>
-        
+            
             <ul id="movies">
                 <c:forEach var="m" items="${movies}">
                     <li>
@@ -80,11 +84,13 @@
                 </c:forEach>
             </ul>
 
-            <button name="page" value="${page-1}" type="submit">-</button>
-            <span>${page}/${maxpage}</span>
-            <button name="page" value="${page+1}" type="submit">+</button>
+            <div id="navigation" class="${movies.size() == 0 ? 'hidden' : ''}">
+                <button name="page" value="${page-1}" type="submit">-</button>
+                <span>${page}/${maxpage}</span>
+                <button name="page" value="${page+1}" type="submit">+</button>
 
-            <button type="submit" name="curres" value="${curres+1}">load more</button> 
+                <button type="submit" name="curres" value="${curres+1}">load more</button> 
+            </div>
         </form>
 
     </body>

@@ -28,7 +28,7 @@ ul {
 }
 
 #movies {
-    margin: 50px;
+    margin: 20px;
     color: white;
 }
 
@@ -123,4 +123,60 @@ h1 {
 
 .details table th:last-child {
     border-top-right-radius: 10px;
+}
+
+#form-all {
+    position:relative;
+}
+#controls {
+    position: relative;
+    width: 100%;
+    height: 70px;
+}
+#controls-inner {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 20px;
+    background-color: #36304A;
+    padding: 15px;
+    border-radius: 10px;
+    width: 60%;
+    color: white;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+button {
+    padding: 2px;
+    font-size: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 2px;
+}
+
+#form-search-outer {
+    position: relative;
+    height: 30px;
+}
+
+#form-search {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#form-search input {
+    padding: 5px;
+}
+
+#navigation {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-bottom: 20px;
+}
+
+.hidden {
+    display: none;
 }
