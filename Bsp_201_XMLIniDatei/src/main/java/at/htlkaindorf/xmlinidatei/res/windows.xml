@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<windows>
+    <window name="main" type="Frame">
+        <xpos>924</xpos>
+        <ypos>497</ypos>
+        <width>555</width>
+        <height>227</height>
+    </window>
+    <window name="kittycat" type="Frame">
+        <xpos>411</xpos>
+        <ypos>296</ypos>
+        <width>341</width>
+        <height>192</height>
+    </window>
+    <window name="alert" type="Dialog">
+        <xpos>1336</xpos>
+        <ypos>776</ypos>
+        <width>300</width>
+        <height>150</height>
+    </window>
+</windows>
