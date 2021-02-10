@@ -28,4 +28,6 @@ public class Current {
     private Wind wind;
     @XmlElement
     private Clouds clouds;
+    @XmlElement
+    private Weather weather;
 }

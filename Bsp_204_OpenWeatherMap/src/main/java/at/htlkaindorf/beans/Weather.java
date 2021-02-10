@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Direction {
+public class Weather {
     @XmlAttribute
-    private String code;
+    private String value;
 }

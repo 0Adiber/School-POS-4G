@@ -4,6 +4,11 @@ import at.htlkaindorf.beans.Current;
 import at.htlkaindorf.xml.XMLAccess;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -28,10 +33,24 @@ public class WeatherController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
+                
         try {
-            Current result = XMLAccess.getInstance().getWeather("Heiligenkreuz am Waasen", "en");
+            Current result = XMLAccess.getInstance().getWeather("Heiligenkreuz am Waasen", "de");
             request.setAttribute("result", result);
+            LocalTime now = LocalTime.now(ZoneOffset.UTC);
+            now.plusSeconds(result.getCity().getTimezone());
+            String img = "sunny";
+            
+            if(Integer.parseInt(result.getClouds().getValue())>50)
+                img = "cloudy";
+            
+            if(result.getWeather().getValue().toLowerCase().contains("rain") || result.getWeather().getValue().toLowerCase().contains("regen"))
+                img = "rainy";
+            
+            if(now.isAfter(LocalTime.of(17,0)) || now.isBefore(LocalTime.of(6,0)))
+                img = "night";
+            
+            request.setAttribute("img", img);
         } catch (JAXBException ex) {
             ex.printStackTrace();
         }
