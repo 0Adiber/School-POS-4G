@@ -14,4 +14,6 @@ import lombok.NoArgsConstructor;
 public class Weather {
     @XmlAttribute
     private String value;
+    @XmlAttribute
+    private String icon;
 }

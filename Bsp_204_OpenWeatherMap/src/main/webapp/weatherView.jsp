@@ -55,11 +55,25 @@
                 </div>
             </div>
             <div id="lower">
-                <h2>Details</h2>
-                <p>Wind ${result.wind.direction.code} ${Math.round(result.wind.speed.value * 36)/10} km/h</p>
-                <p>${lang == "de" ? 'Luftfeuchtigkeit' : 'Humnidity'} ${result.humidity.value}%</p>
-                <p>${lang == "de" ? 'Wolken' : 'Clouds'} ${result.clouds.value}%</p>
-                <p>${lang == "de" ? 'Luftdruck' : 'Pressure'} ${result.pressure.value} ${result.pressure.unit}</p>
+                <div><img src="http://openweathermap.org/img/wn/${result.weather.icon}@2x.png" /></div>
+                <div class="right">
+                    <div>
+                        <p>Wind</p>
+                        <p>${Math.round(result.wind.speed.value * 36)/10} km/h ➜ ${result.wind.direction.code}</p>
+                    </div>
+                    <div>
+                        <p>${lang == "de" ? 'Luftfeuchtigkeit' : 'Humidity'}</p>
+                        <p>${result.humidity.value}%</p>
+                    </div>
+                    <div>
+                        <p>${lang == "de" ? 'Wolken' : 'Clouds'}</p>
+                        <p>${result.clouds.value}%</p>
+                    </div>
+                    <div>
+                        <p>${lang == "de" ? 'Luftdruck' : 'Pressure'}</p>
+                        <p>${result.pressure.value} ${result.pressure.unit}</p>
+                    </div>
+                </div>
             </div>
         </c:if>
     </body>

@@ -49,7 +49,7 @@ public class WeatherController extends HttpServlet {
                 request.setAttribute("city", city);
                 request.setAttribute("result", result);
                 LocalTime now = LocalTime.now(ZoneOffset.UTC);
-                now.plusSeconds(result.getCity().getTimezone());
+                now = now.plusSeconds(result.getCity().getTimezone());
                 String img = "sunny";
 
                 if(Integer.parseInt(result.getClouds().getValue())>50)
