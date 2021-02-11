@@ -2,6 +2,7 @@ package at.htlkaindorf.controller;
 
 import at.htlkaindorf.beans.Current;
 import at.htlkaindorf.xml.XMLAccess;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDateTime;
@@ -33,27 +34,37 @@ public class WeatherController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-                
-        try {
-            Current result = XMLAccess.getInstance().getWeather("Heiligenkreuz am Waasen", "de");
-            request.setAttribute("result", result);
-            LocalTime now = LocalTime.now(ZoneOffset.UTC);
-            now.plusSeconds(result.getCity().getTimezone());
-            String img = "sunny";
-            
-            if(Integer.parseInt(result.getClouds().getValue())>50)
-                img = "cloudy";
-            
-            if(result.getWeather().getValue().toLowerCase().contains("rain") || result.getWeather().getValue().toLowerCase().contains("regen"))
-                img = "rainy";
-            
-            if(now.isAfter(LocalTime.of(17,0)) || now.isBefore(LocalTime.of(6,0)))
-                img = "night";
-            
-            request.setAttribute("img", img);
-        } catch (JAXBException ex) {
-            ex.printStackTrace();
-        }
+        
+        String city = request.getParameter("city");
+        String lang = request.getParameter("lang");
+        
+        if(lang == null || lang.trim().isEmpty())
+            lang = "de";
+        
+        request.setAttribute("lang", lang);
+        
+        if(city != null && !city.trim().isEmpty())        
+            try {
+                Current result = XMLAccess.getInstance().getWeather(city, lang);
+                request.setAttribute("city", city);
+                request.setAttribute("result", result);
+                LocalTime now = LocalTime.now(ZoneOffset.UTC);
+                now.plusSeconds(result.getCity().getTimezone());
+                String img = "sunny";
+
+                if(Integer.parseInt(result.getClouds().getValue())>50)
+                    img = "cloudy";
+
+                if(result.getWeather().getValue().toLowerCase().contains("rain") || result.getWeather().getValue().toLowerCase().contains("regen"))
+                    img = "rainy";
+
+                if(now.isAfter(LocalTime.of(17,0)) || now.isBefore(LocalTime.of(6,0)))
+                    img = "night";
+
+                request.setAttribute("img", img);
+            } catch (JAXBException | FileNotFoundException e) {
+                request.setAttribute("error", "City not found");
+            }
         
         request.getRequestDispatcher("weatherView.jsp").forward(request, response);
     }

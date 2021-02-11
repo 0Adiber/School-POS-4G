@@ -1,6 +1,7 @@
 package at.htlkaindorf.xml;
 
 import at.htlkaindorf.beans.Current;
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.bind.JAXBContext;
@@ -29,7 +30,7 @@ public class XMLAccess {
         return instance;
     }
     
-    public Current getWeather(String city, String lang) throws MalformedURLException, JAXBException {
+    public Current getWeather(String city, String lang) throws MalformedURLException, JAXBException, FileNotFoundException {
         URL url = new URL(BASE_URL + "&q=" + city + "&lang=" + lang);
         return (Current) unmarshaller.unmarshal(url);
     }

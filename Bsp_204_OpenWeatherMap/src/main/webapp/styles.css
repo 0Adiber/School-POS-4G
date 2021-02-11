@@ -12,6 +12,26 @@ html, body {
     height: 100%;
     font-family: 'JetBrains Mono', monospace;
     position: relative;
+    z-index: -1;
+}
+
+#default {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.error {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: auto;
+    padding: 10px;
+    font-size: 0.7em;
+    color: black;
+    background-color: #ff6666; 
 }
 
 #img {
@@ -24,21 +44,52 @@ html, body {
     background-position: center;
 }
 
-.cloudy-bg {
-    
-    
+#search {
+    position: absolute;
+    z-index: 999;
+    right: 1em;
+    top: 1em;
+    width: 200px;
 }
-.sunny-bg {
-    background-image: url("img/sunny.webp");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+
+#def-search {
+    width: 60%;
+    max-width: 400px;
+    position: absolute;
+    z-index: 999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
-.night-bg {
-    background-image: url("img/night.webp");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+
+#def-search form input {
+    font-size: 1.5em;
+}
+
+.search {
+    width: 100%;
+    padding: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+    opacity: 0.5;
+    transition: opacity 200ms ease-in-out;
+}
+
+.search:focus{
+    opacity: 1;
+}
+
+#language select {
+    outline: none;
+}
+
+#language {
+    opacity: 0.5;
+    transition: opacity 200ms ease-in-out;
+}
+
+#language:hover {
+    opacity: 1;
 }
 
 #upper {
@@ -52,17 +103,18 @@ html, body {
     top: 50%;
     left: 50%;
     transform: translate(-50%,-50%);
-    width: 500px;
+    width: auto;
 }
 
 .inner .flex-row h1 {
     font-size: 3em;
+    margin-right: 1em;
 }
 
 .flex-row {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 #lower {
