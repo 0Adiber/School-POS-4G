@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,8 +39,19 @@ public class WeatherController extends HttpServlet {
         String city = request.getParameter("city");
         String lang = request.getParameter("lang");
         
-        if(lang == null || lang.trim().isEmpty())
+        if(lang == null || lang.trim().isEmpty()) {
             lang = "de";
+            if(request.getCookies() != null)
+                for(Cookie c : request.getCookies()) {
+                    if(c.getName().equalsIgnoreCase("language")) {
+                        lang = c.getValue();
+                    }
+                }
+        } else {
+            Cookie cLang = new Cookie("language", lang);
+            cLang.setMaxAge(86400*365);
+            response.addCookie(cLang);
+        }
         
         request.setAttribute("lang", lang);
         
