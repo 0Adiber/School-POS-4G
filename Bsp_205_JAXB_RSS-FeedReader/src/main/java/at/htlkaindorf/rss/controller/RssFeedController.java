@@ -1,18 +1,45 @@
 package at.htlkaindorf.rss.controller;
 
+import at.htlkaindorf.rss.beans.FeedSite;
+import at.htlkaindorf.rss.beans.RSS;
+import at.htlkaindorf.rss.xml.XMLAccess;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.JAXBException;
 
 @WebServlet(name = "RssFeedController", urlPatterns = {"/RssFeedController"})
 public class RssFeedController extends HttpServlet {
 
+    private static List<FeedSite> RSS_FEEDS;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config); //To change body of generated methods, choose Tools | Templates.
+        
+        RSS_FEEDS = new ArrayList<>();
+        
+        try {
+            RSS_FEEDS.add(new FeedSite("Die Presse - Innenpolitik", new URL("https://www.diepresse.com/rss/Innenpolitik")));
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(RssFeedController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -25,18 +52,10 @@ public class RssFeedController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet RssFeedController</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet RssFeedController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+        
+        request.setAttribute("allfeeds", RSS_FEEDS);
+        
+        request.getRequestDispatcher("feed.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
