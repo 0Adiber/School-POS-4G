@@ -24,8 +24,8 @@ import javax.xml.bind.JAXBException;
 @WebServlet(name = "RssFeedController", urlPatterns = {"/RssFeedController"})
 public class RssFeedController extends HttpServlet {
 
-    private static List<FeedSite> RSS_FEEDS;
-
+    private static List<FeedSite> RSS_FEEDS; // default feeds
+    
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config); //To change body of generated methods, choose Tools | Templates.
@@ -34,6 +34,7 @@ public class RssFeedController extends HttpServlet {
         
         try {
             RSS_FEEDS.add(new FeedSite("Die Presse - Innenpolitik", new URL("https://www.diepresse.com/rss/Innenpolitik")));
+            RSS_FEEDS.add(new FeedSite("Die Presse - Unternehmen", new URL("https://www.diepresse.com/rss/Unternehmen")));
         } catch (MalformedURLException ex) {
             Logger.getLogger(RssFeedController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -53,7 +54,11 @@ public class RssFeedController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        request.setAttribute("allfeeds", RSS_FEEDS);
+        //request.setAttribute("allfeeds", RSS_FEEDS);
+        
+        if(request.getSession().getAttribute("feeds") == null) {
+            request.getSession().setAttribute("feeds", new ArrayList<>(RSS_FEEDS));
+        }
         
         request.getRequestDispatcher("feed.jsp").forward(request, response);
     }
@@ -84,6 +89,34 @@ public class RssFeedController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        String url = request.getParameter("rss");
+        String feed = request.getParameter("feed");
+                
+        if(url != null && !url.trim().isEmpty()) {
+            
+            try {
+                RSS result = XMLAccess.getInstance().fetchFeed(new URL(url));
+                
+                request.setAttribute("result", result);
+            } catch (JAXBException ex) {
+                request.setAttribute("error", "Could not fetch RSS Feed");
+            }
+            
+        } else if(feed != null && !feed.trim().isEmpty()) {
+            
+            List<FeedSite> feeds = (ArrayList<FeedSite>)request.getSession().getAttribute("feeds");
+                        
+            try {
+                RSS result = XMLAccess.getInstance().fetchFeed(new URL(feed));
+                feeds.add(new FeedSite(result.getChannel().getTitle(), new URL(feed)));
+                request.getSession().setAttribute("feeds", feeds);
+            } catch (JAXBException | MalformedURLException ex) {
+                request.setAttribute("error", "Could not add RSS feed");
+            }
+            
+        }
+        
         processRequest(request, response);
     }
 
