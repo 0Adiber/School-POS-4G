@@ -1,6 +1,7 @@
 package at.htlkaindorf.rss.controller;
 
 import at.htlkaindorf.rss.beans.FeedSite;
+import at.htlkaindorf.rss.beans.Item;
 import at.htlkaindorf.rss.beans.RSS;
 import at.htlkaindorf.rss.xml.XMLAccess;
 import java.io.IOException;
@@ -32,12 +33,9 @@ public class RssFeedController extends HttpServlet {
         
         RSS_FEEDS = new ArrayList<>();
         
-        try {
-            RSS_FEEDS.add(new FeedSite("Die Presse - Innenpolitik", new URL("https://www.diepresse.com/rss/Innenpolitik")));
-            RSS_FEEDS.add(new FeedSite("Die Presse - Unternehmen", new URL("https://www.diepresse.com/rss/Unternehmen")));
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(RssFeedController.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        RSS_FEEDS.add(new FeedSite("Die Presse - Innenpolitik", "https://www.diepresse.com/rss/Innenpolitik"));
+        RSS_FEEDS.add(new FeedSite("Die Presse - Unternehmen", "https://www.diepresse.com/rss/Unternehmen"));
+
         
     }
     
@@ -58,6 +56,14 @@ public class RssFeedController extends HttpServlet {
         
         if(request.getSession().getAttribute("feeds") == null) {
             request.getSession().setAttribute("feeds", new ArrayList<>(RSS_FEEDS));
+        }
+        
+        if(request.getSession().getAttribute("read") == null) {
+            request.getSession().setAttribute("read", new ArrayList<String>());
+        }
+        
+        if(request.getSession().getAttribute("hidden") == null) {
+            request.getSession().setAttribute("hidden", new ArrayList<String>());
         }
         
         request.getRequestDispatcher("feed.jsp").forward(request, response);
@@ -92,11 +98,25 @@ public class RssFeedController extends HttpServlet {
         
         String url = request.getParameter("rss");
         String feed = request.getParameter("feed");
-                
+        String unsubscribe = request.getParameter("unsubscribe");
+        String read = request.getParameter("read");
+        String unread = request.getParameter("unread");
+        String hide = request.getParameter("remove");
+        
+        List<FeedSite> feeds = (ArrayList<FeedSite>)request.getSession().getAttribute("feeds");
+        List<String> readArticles = (ArrayList<String>)request.getSession().getAttribute("read");
+        List<String> hidenArticles = (ArrayList<String>)request.getSession().getAttribute("hidden");
+        
         if(url != null && !url.trim().isEmpty()) {
             
             try {
                 RSS result = XMLAccess.getInstance().fetchFeed(new URL(url));
+                                
+                result.getChannel().getItems().removeIf(i -> hidenArticles.contains(i.getGuid()));
+                
+                result.getChannel().getItems().stream().filter(item -> (readArticles.contains(item.getGuid()))).forEachOrdered(item -> {
+                    item.setRead(true);
+                });
                 
                 request.setAttribute("result", result);
             } catch (JAXBException ex) {
@@ -104,16 +124,36 @@ public class RssFeedController extends HttpServlet {
             }
             
         } else if(feed != null && !feed.trim().isEmpty()) {
+                      
+            if(!feeds.stream().anyMatch(f -> f.getUrl().equals(url)))
+                try {
+                    RSS result = XMLAccess.getInstance().fetchFeed(new URL(feed));
+
+                    feeds.add(new FeedSite(result.getChannel().getTitle(), feed));
+                    request.getSession().setAttribute("feeds", feeds);
+                } catch (JAXBException | MalformedURLException ex) {
+                    request.setAttribute("error", "Could not add RSS feed");
+                }
+
+        } else if(unsubscribe != null && !unsubscribe.trim().isEmpty()) {
             
-            List<FeedSite> feeds = (ArrayList<FeedSite>)request.getSession().getAttribute("feeds");
+            feeds.removeIf(f -> f.getUrl().equals(unsubscribe));
+            request.getSession().setAttribute("feeds", feeds);
+            
+        } else if(read != null && !read.trim().isEmpty()) {
+            
+            readArticles.add(read);
+            request.getSession().setAttribute("read", readArticles);
+            
+        } else if(hide != null && !hide.trim().isEmpty()) {
                         
-            try {
-                RSS result = XMLAccess.getInstance().fetchFeed(new URL(feed));
-                feeds.add(new FeedSite(result.getChannel().getTitle(), new URL(feed)));
-                request.getSession().setAttribute("feeds", feeds);
-            } catch (JAXBException | MalformedURLException ex) {
-                request.setAttribute("error", "Could not add RSS feed");
-            }
+            hidenArticles.add(hide);
+            request.getSession().setAttribute("hidden", hidenArticles);
+            
+        } else if(unread != null && !unread.trim().isEmpty()) {
+                        
+            readArticles.remove(unread);
+            request.getSession().setAttribute("read", readArticles);
             
         }
         
