@@ -1,8 +1,8 @@
 package at.htlkaindorf.rss.beans;
 
 import at.htlkaindorf.rss.xml.DateAdapter;
-import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Item {
+    private static DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     @XmlElement
     private String title, link, description;
     @XmlElement
@@ -29,4 +30,10 @@ public class Item {
     
     @XmlTransient
     private boolean read = false;
+    
+    public String formattedDate() {
+        if(pubDate == null)
+            return "";
+        return pubDate.format(DTF);
+    }
 }

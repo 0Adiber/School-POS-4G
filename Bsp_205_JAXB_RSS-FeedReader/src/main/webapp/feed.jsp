@@ -16,41 +16,52 @@
     </head>
     <body>
         <c:if test="${error != null}">
-            <h3>Error: ${error}</h3>
+            <h3 class="error">Error: ${error}</h3>
         </c:if>
         
         <c:if test="${result == null}">
             <form action="./RssFeedController" method="POST">
 
-                <ul>
-                    <c:forEach items="${feeds}" var="f">
-                        <li>
-                            <a href="${f.url}">${f.title}</a>
-                            <button type="submit" name="rss" value="${f.url}">OPEN</button>
-                            <button type="submit" name="unsubscribe" value="${f.url}">unsubscribe</button>
-                        </li>
-                    </c:forEach>
-                </ul>
+                <div id="feeds">
+                    <ul>
+                        <c:forEach items="${feeds}" var="f">
+                            <li>
+                                <a href="${f.url}">${f.title}</a>
+                                <div>
+                                    <button type="submit" name="rss" value="${f.url}">OPEN</button>
+                                    <button type="submit" name="unsubscribe" value="${f.url}">unsubscribe</button>
+                                </div>
+                            </li>
+                        </c:forEach>
+                    </ul>
+                </div>
+                
+            </form>
 
+            <form action="./RssFeedController" method="POST" id="subscriber">
                 <input type="url" name="feed" />
-
                 <button type="submit">subscribe</button>
             </form>
         </c:if>
             
         <c:if test="${result != null}">
+            <div class="home">
+                <a href="./"><img src="img/home-solid.svg" /></a>
+            </div>
             <h2><a href="${result.channel.link}">${result.channel.title}</a></h2>
             <form action="./RssFeedController" method="POST">
                 <ul id="articles">
                     <c:forEach items="${result.channel.items}" var="i">
                         <li>
+                            
                             <c:if test="${fn:contains(i.enclosure.type, 'image')}">
-                                <img src="${i.enclosure.url}" />
+                                <img src="${i.enclosure.url}" ${i.read ? 'style="filter: blur(2px);"' : ''}/>
                             </c:if>
-                            <div class="middle">
-                                <p class="title"><a href="${i.link}" target="_blank">${i.title}</a>, ${i.pubDate}</p>
+                            <div class="middle" ${i.read ? 'style="filter: blur(2px);"' : ''}>
+                                <p class="title"><a href="${i.link}" target="_blank">${i.title}</a>, ${i.formattedDate()}</p>
                                 <p class="description">${i.description}</p>
                             </div>
+                            
                             <div>
                                 <c:if test="${i.read == false}">
                                     <button type="submit" name="read" value="${i.guid}"><img src="img/eye-regular.svg"></button>

@@ -4,6 +4,7 @@ import at.htlkaindorf.rss.beans.FeedSite;
 import at.htlkaindorf.rss.beans.Item;
 import at.htlkaindorf.rss.beans.RSS;
 import at.htlkaindorf.rss.xml.XMLAccess;
+import com.sun.org.apache.xerces.internal.util.FeatureState;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
@@ -81,6 +82,7 @@ public class RssFeedController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.getSession().setAttribute("result", null);
         processRequest(request, response);
     }
 
@@ -106,7 +108,7 @@ public class RssFeedController extends HttpServlet {
         List<FeedSite> feeds = (ArrayList<FeedSite>)request.getSession().getAttribute("feeds");
         List<String> readArticles = (ArrayList<String>)request.getSession().getAttribute("read");
         List<String> hidenArticles = (ArrayList<String>)request.getSession().getAttribute("hidden");
-        
+                
         if(url != null && !url.trim().isEmpty()) {
             
             try {
@@ -118,14 +120,16 @@ public class RssFeedController extends HttpServlet {
                     item.setRead(true);
                 });
                 
-                request.setAttribute("result", result);
+                request.getSession().setAttribute("result", result);
             } catch (JAXBException ex) {
                 request.setAttribute("error", "Could not fetch RSS Feed");
             }
             
-        } else if(feed != null && !feed.trim().isEmpty()) {
+        }
+        
+        if(feed != null && !feed.trim().isEmpty()) {
                       
-            if(!feeds.stream().anyMatch(f -> f.getUrl().equals(url)))
+            if(!feeds.stream().anyMatch(f -> f.getUrl().equals(feed)))
                 try {
                     RSS result = XMLAccess.getInstance().fetchFeed(new URL(feed));
 
@@ -145,16 +149,35 @@ public class RssFeedController extends HttpServlet {
             readArticles.add(read);
             request.getSession().setAttribute("read", readArticles);
             
+            RSS result = (RSS) request.getSession().getAttribute("result");
+            result.getChannel().getItems().stream().filter(item -> (readArticles.contains(item.getGuid()))).forEachOrdered(item -> {
+                item.setRead(true);
+            });
+            request.getSession().setAttribute("result", result);
+            
         } else if(hide != null && !hide.trim().isEmpty()) {
                         
             hidenArticles.add(hide);
             request.getSession().setAttribute("hidden", hidenArticles);
             
+            RSS result = (RSS) request.getSession().getAttribute("result");
+            result.getChannel().getItems().removeIf(i -> hidenArticles.contains(i.getGuid()));
+            request.getSession().setAttribute("result", result);
+                        
         } else if(unread != null && !unread.trim().isEmpty()) {
                         
             readArticles.remove(unread);
             request.getSession().setAttribute("read", readArticles);
             
+            RSS result = (RSS) request.getSession().getAttribute("result");
+            
+            result.getChannel().getItems().stream().filter(item -> item.isRead()).forEachOrdered(item -> {
+                if(!readArticles.contains(item.getGuid())) {
+                    item.setRead(false);
+                }
+            });
+            
+            request.getSession().setAttribute("result", result);
         }
         
         processRequest(request, response);
